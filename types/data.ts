@@ -65,34 +65,34 @@ export interface MultiSeriesData {
  */
 export const SERIES_CONFIGS: Omit<SeriesConfig, 'data'>[] = [
   {
-    key: 'yield_5y',
-    name: '5-Year Treasury',
+    key: 'treasury_1y',
+    name: '1-Year Treasury',
     color: '#3b82f6', // blue-500
     visible: true,
     category: 'yields',
     unit: '%'
   },
   {
-    key: 'yield_10y',
-    name: '10-Year Treasury',
-    color: '#1d4ed8', // blue-700
+    key: 'treasury_5y',
+    name: '5-Year Treasury',
+    color: '#10b981', // emerald-500
     visible: true,
     category: 'yields',
     unit: '%'
   },
   {
-    key: 'yield_15y',
-    name: '15-Year Treasury',
-    color: '#1e40af', // blue-800
-    visible: false,
+    key: 'treasury_10y',
+    name: '10-Year Treasury',
+    color: '#f59e0b', // amber-500
+    visible: true,
     category: 'yields',
     unit: '%'
   },
   {
-    key: 'yield_20y',
+    key: 'treasury_20y',
     name: '20-Year Treasury',
-    color: '#1e3a8a', // blue-900
-    visible: false,
+    color: '#ef4444', // red-500
+    visible: true,
     category: 'yields',
     unit: '%'
   },

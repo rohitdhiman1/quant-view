@@ -2,6 +2,7 @@ import { promises as fs } from 'fs'
 import path from 'path'
 import { MultiSeriesData, SeriesConfig, DataSeries, SERIES_CONFIGS } from '@/types/data'
 import MultiSeriesChartComponent from '@/components/ChartComponent'
+import DataFreshnessIndicator from '@/components/DataFreshnessIndicator'
 
 /**
  * Load data for a specific series
@@ -25,10 +26,10 @@ async function loadSeriesData(filename: string): Promise<DataSeries> {
 export default async function QuantViewDashboard() {
   // Load all data series
   const seriesDataPromises = [
-    { key: 'yield_5y', filename: 'yield_5y.json' },
-    { key: 'yield_10y', filename: 'treasury_yield.json' }, // Legacy 10Y data
-    { key: 'yield_15y', filename: 'yield_15y.json' },
-    { key: 'yield_20y', filename: 'yield_20y.json' },
+    { key: 'treasury_1y', filename: 'treasury_1y.json' },
+    { key: 'treasury_5y', filename: 'treasury_5y.json' },
+    { key: 'treasury_10y', filename: 'treasury_10y.json' },
+    { key: 'treasury_20y', filename: 'treasury_20y.json' },
     { key: 'cpi', filename: 'cpi.json' },
     { key: 'fed_rate', filename: 'fed_rate.json' },
     { key: 'vix', filename: 'vix.json' },
@@ -180,6 +181,11 @@ export default async function QuantViewDashboard() {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Data Freshness Indicator */}
+        <div className="mb-8">
+          <DataFreshnessIndicator />
         </div>
 
         {/* Enhanced Multi-Series Chart */}

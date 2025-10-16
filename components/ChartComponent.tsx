@@ -3,6 +3,7 @@
 import React, { useState, useMemo } from 'react'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
 import { MultiSeriesData, SeriesConfig } from '@/types/data'
+import MonthSelector from './MonthSelector'
 
 /**
  * Props interface for the MultiSeriesChartComponent
@@ -105,13 +106,62 @@ export default function MultiSeriesChartComponent({
   const [visibleSeries, setVisibleSeries] = useState<Set<string>>(
     new Set(data.series.filter(s => s.visible).map(s => s.key))
   )
+  
+  // Year filtering for daily data
+  const [selectedYear, setSelectedYear] = useState<string>(() => {
+    const currentYear = new Date().getFullYear()
+    return currentYear.toString()
+  })
+  
+  // Month filtering for enhanced focus - default to current month
+  const [selectedMonths, setSelectedMonths] = useState<number[]>(() => {
+    const currentMonth = new Date().getMonth() + 1 // 1-based month
+    return [currentMonth]
+  })
+  
+  // Get available months for the selected year (currently unused but ready for future enhancements)
+  const availableMonths = useMemo(() => {
+    const months = new Set<number>()
+    data.series.forEach(series => {
+      series.data.forEach(point => {
+        const date = new Date(point.date)
+        const year = date.getFullYear().toString()
+        if (year === selectedYear) {
+          months.add(date.getMonth() + 1) // 1-based month
+        }
+      })
+    })
+    return Array.from(months).sort()
+  }, [data.series, selectedYear])
+  
+  // Get available years from data
+  const availableYears = useMemo(() => {
+    const years = new Set<string>()
+    data.series.forEach(series => {
+      series.data.forEach(point => {
+        const year = new Date(point.date).getFullYear().toString()
+        years.add(year)
+      })
+    })
+    return Array.from(years).sort().reverse() // Most recent first
+  }, [data.series])
 
-  // Combine all data points by date
+  // Combine all data points by date with year and month filtering
   const combinedData = useMemo(() => {
     const dateMap = new Map<string, Record<string, number | string>>()
     
     data.series.forEach(series => {
       series.data.forEach(point => {
+        const date = new Date(point.date)
+        const pointYear = date.getFullYear().toString()
+        const pointMonth = date.getMonth() + 1 // 1-based month
+        
+        // Filter by selected year
+        if (pointYear !== selectedYear) return
+        
+        // Filter by selected months (if any months are selected)
+        if (selectedMonths.length > 0 && !selectedMonths.includes(pointMonth)) return
+        
         if (!dateMap.has(point.date)) {
           dateMap.set(point.date, { date: point.date })
         }
@@ -125,11 +175,8 @@ export default function MultiSeriesChartComponent({
       new Date(a.date as string).getTime() - new Date(b.date as string).getTime()
     )
     
-    // Debug: Log the first few data points to check structure
-    console.log('Combined data sample:', sortedData.slice(0, 3))
-    
     return sortedData
-  }, [data.series])
+  }, [data.series, selectedYear, selectedMonths])
 
   const toggleSeries = (seriesKey: string) => {
     const newVisibleSeries = new Set(visibleSeries)
@@ -143,7 +190,11 @@ export default function MultiSeriesChartComponent({
 
   const visibleSeriesConfigs = data.series.filter(s => visibleSeries.has(s.key))
   const currentValues = visibleSeriesConfigs.map(series => {
-    const latestData = series.data[series.data.length - 1]
+    // Get latest data for selected year
+    const yearData = series.data.filter(point => 
+      new Date(point.date).getFullYear().toString() === selectedYear
+    )
+    const latestData = yearData[yearData.length - 1]
     return {
       name: series.name,
       value: latestData?.value || 0,
@@ -151,12 +202,14 @@ export default function MultiSeriesChartComponent({
     }
   })
 
-  // Calculate Y-axis domain based on visible data
+  // Calculate Y-axis domain based on visible data for selected year
   const yAxisDomain = useMemo(() => {
     if (visibleSeriesConfigs.length === 0) return [0, 10]
     
     const allVisibleValues = visibleSeriesConfigs.flatMap(series => 
-      series.data.map(point => point.value)
+      series.data
+        .filter(point => new Date(point.date).getFullYear().toString() === selectedYear)
+        .map(point => point.value)
     ).filter(val => typeof val === 'number' && !isNaN(val))
     
     if (allVisibleValues.length === 0) return [0, 10]
@@ -169,7 +222,7 @@ export default function MultiSeriesChartComponent({
       Math.max(0, minVal - padding),
       maxVal + padding
     ]
-  }, [visibleSeriesConfigs])
+  }, [visibleSeriesConfigs, selectedYear, selectedMonths])
 
   // Group series by category for better organization
   const seriesByCategory = data.series.reduce((acc, series) => {
@@ -190,6 +243,57 @@ export default function MultiSeriesChartComponent({
           <span>•</span>
           <span>{data.dateRange.start} to {data.dateRange.end}</span>
         </div>
+      </div>
+
+      {/* Year Selection */}
+      <div className="mb-6">
+        <h3 className="text-sm font-semibold text-gray-700 mb-3">Select Year</h3>
+        <div className="flex flex-wrap gap-2">
+          {availableYears.map(year => {
+            const isSelected = selectedYear === year
+            const isCurrent = year === new Date().getFullYear().toString()
+            return (
+              <button
+                key={year}
+                onClick={() => setSelectedYear(year)}
+                className={`
+                  group relative px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-300 ease-out
+                  ${isSelected
+                    ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/25 transform scale-105 border border-blue-500'
+                    : 'bg-white text-gray-700 border border-gray-200 hover:border-gray-300 hover:shadow-md hover:bg-gray-50 cursor-pointer hover:transform hover:scale-105'
+                  }
+                  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+                `}
+              >
+                <span className="relative z-10">
+                  {year}
+                  {isCurrent && (
+                    <span className="ml-1 text-xs opacity-75">Current</span>
+                  )}
+                </span>
+                {isSelected && (
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-blue-500 rounded-xl opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
+                )}
+              </button>
+            )
+          })}
+        </div>
+        <p className="text-xs text-gray-500 mt-2">
+          📊 Showing daily data for {selectedYear} • {combinedData.length} data points
+        </p>
+      </div>
+
+      {/* Month Selection */}
+      <div className="mb-8">
+        <MonthSelector
+          selectedMonths={selectedMonths}
+          onMonthsChange={(months) => {
+            setSelectedMonths(months)
+          }}
+          disabled={false}
+          availableMonths={availableMonths}
+          selectedYear={selectedYear}
+        />
       </div>
 
       {/* Series Selection Chips */}
@@ -261,16 +365,107 @@ export default function MultiSeriesChartComponent({
                 vertical={false}
               />
               
-              {/* X Axis */}
+              {/* X Axis - Intelligent Labeling */}
               <XAxis 
                 dataKey="date"
                 axisLine={false}
                 tickLine={false}
-                tick={{ fontSize: 12, fill: '#6b7280' }}
+                tick={{ fontSize: 11, fill: '#6b7280' }}
+                tickCount={(() => {
+                  if (selectedMonths.length === 0) return 6 // Full year - quarterly view
+                  if (selectedMonths.length === 1) return 6 // Single month - weekly view
+                  if (selectedMonths.length <= 2) return 8 // 2 months - bi-weekly view
+                  if (selectedMonths.length <= 4) return 6 // 3-4 months - monthly view
+                  if (selectedMonths.length <= 6) return 5 // 5-6 months - monthly markers
+                  return 4 // 7+ months - broader view
+                })()}
                 tickFormatter={(value) => {
                   const date = new Date(value)
-                  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                  
+                  // No months selected (full year): Show month only for better spacing
+                  if (selectedMonths.length === 0) {
+                    return date.toLocaleDateString('en-US', { 
+                      month: 'short'
+                    })
+                  }
+                  
+                  // Single month: Show date with weekday for clarity
+                  if (selectedMonths.length === 1) {
+                    const day = date.getDate()
+                    const isFirstOrFifteenth = day === 1 || day === 15
+                    
+                    if (isFirstOrFifteenth || combinedData.length <= 20) {
+                      return date.toLocaleDateString('en-US', { 
+                        month: 'short', 
+                        day: 'numeric' 
+                      })
+                    }
+                    return day.toString()
+                  }
+                  
+                  // 2 months: Show month + day for key dates
+                  if (selectedMonths.length === 2) {
+                    return date.toLocaleDateString('en-US', { 
+                      month: 'short', 
+                      day: 'numeric' 
+                    })
+                  }
+                  
+                  // 3-4 months: Smart month + day labeling to avoid repetition
+                  if (selectedMonths.length <= 4) {
+                    const day = date.getDate()
+                    // Always show month + day for clarity and to avoid repetition
+                    if (day === 1) {
+                      return date.toLocaleDateString('en-US', { 
+                        month: 'short', 
+                        day: 'numeric' 
+                      })
+                    } else if (day >= 15 && day <= 16) {
+                      return date.toLocaleDateString('en-US', { 
+                        month: 'short', 
+                        day: 'numeric' 
+                      })
+                    }
+                    // For other days, show month + day to maintain context
+                    return date.toLocaleDateString('en-US', { 
+                      month: 'short', 
+                      day: 'numeric' 
+                    })
+                  }
+                  
+                  // 5-6 months: Smart month labeling with dates to avoid repetition
+                  if (selectedMonths.length <= 6) {
+                    const day = date.getDate()
+                    // Show month + day for first of month and mid-month to create variety
+                    if (day === 1) {
+                      return date.toLocaleDateString('en-US', { 
+                        month: 'short', 
+                        day: 'numeric' 
+                      })
+                    } else if (day >= 15 && day <= 16) {
+                      return date.toLocaleDateString('en-US', { 
+                        month: 'short', 
+                        day: 'numeric' 
+                      })
+                    }
+                    return date.toLocaleDateString('en-US', { 
+                      month: 'short'
+                    })
+                  }
+                  
+                  // 7+ months: Month only for clean overview
+                  return date.toLocaleDateString('en-US', { 
+                    month: 'short'
+                  })
                 }}
+                interval={(() => {
+                  if (selectedMonths.length === 0) return Math.max(1, Math.floor(combinedData.length / 6))
+                  if (selectedMonths.length >= 7) return Math.max(1, Math.floor(combinedData.length / 4))
+                  if (selectedMonths.length >= 5) return Math.max(1, Math.floor(combinedData.length / 5))
+                  if (selectedMonths.length >= 3) return Math.max(1, Math.floor(combinedData.length / 6))
+                  return 'preserveStartEnd'
+                })()}
+                minTickGap={35}
               />
               
               {/* Y Axis */}
