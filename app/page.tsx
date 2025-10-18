@@ -86,14 +86,14 @@ export default async function QuantViewDashboard() {
   const activeSeries = series.filter(s => s.data.length > 0).length
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-gray-900 dark:to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Header */}
-      <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm">
+      <header className="bg-white border-b border-gray-200 shadow-sm">
         <div className="mx-auto px-6 sm:px-8 lg:px-12 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Quant View</h1>
-              <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+              <h1 className="text-3xl font-bold text-gray-900">Quant View</h1>
+              <p className="mt-1 text-sm text-gray-600">
                 Multi-Series Financial Analytics Dashboard
               </p>
             </div>
@@ -107,16 +107,16 @@ export default async function QuantViewDashboard() {
         {/* Key Metrics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           {/* Active Series */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex items-center">
               <div className="flex-1">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Active Series</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{activeSeries}</p>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">of {series.length} available</p>
+                <p className="text-sm font-medium text-gray-600">Active Series</p>
+                <p className="text-2xl font-bold text-gray-900">{activeSeries}</p>
+                <p className="text-sm text-gray-500 mt-1">of {series.length} available</p>
               </div>
               <div className="ml-3">
-                <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
-                  <svg className="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                   </svg>
                 </div>
@@ -125,16 +125,16 @@ export default async function QuantViewDashboard() {
           </div>
 
           {/* Data Coverage */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex items-center">
               <div className="flex-1">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Data Coverage</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{allDates.length}</p>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">unique dates</p>
+                <p className="text-sm font-medium text-gray-600">Data Coverage</p>
+                <p className="text-2xl font-bold text-gray-900">{allDates.length}</p>
+                <p className="text-sm text-gray-500 mt-1">unique dates</p>
               </div>
               <div className="ml-3">
-                <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
-                  <svg className="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                  <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
                 </div>
@@ -143,16 +143,16 @@ export default async function QuantViewDashboard() {
           </div>
 
           {/* Total Data Points */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex items-center">
               <div className="flex-1">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Data Points</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{totalDataPoints}</p>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">across all series</p>
+                <p className="text-sm font-medium text-gray-600">Total Data Points</p>
+                <p className="text-2xl font-bold text-gray-900">{totalDataPoints}</p>
+                <p className="text-sm text-gray-500 mt-1">across all series</p>
               </div>
               <div className="ml-3">
-                <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center">
-                  <svg className="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                  <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                   </svg>
                 </div>
@@ -161,20 +161,20 @@ export default async function QuantViewDashboard() {
           </div>
 
           {/* Date Range */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex items-center">
               <div className="flex-1">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Date Range</p>
-                <p className="text-lg font-bold text-gray-900 dark:text-gray-100">
+                <p className="text-sm font-medium text-gray-600">Date Range</p>
+                <p className="text-lg font-bold text-gray-900">
                   {new Date(dateRange.start).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
                 </p>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                <p className="text-sm text-gray-500 mt-1">
                   to {new Date(dateRange.end).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
                 </p>
               </div>
               <div className="ml-3">
-                <div className="w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center">
-                  <svg className="w-6 h-6 text-orange-600 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                  <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
@@ -192,24 +192,24 @@ export default async function QuantViewDashboard() {
         </div>
 
         {/* Data Series Overview */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-8">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Available Data Series</h3>
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Available Data Series</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {series.map(s => (
-              <div key={s.key} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+              <div key={s.key} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                 <div className="flex items-center space-x-3">
                   <div 
                     className="w-4 h-4 rounded-full" 
                     style={{ backgroundColor: s.color }}
                   ></div>
                   <div>
-                    <p className="font-medium text-gray-900 dark:text-gray-100 text-sm">{s.name}</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 capitalize">{s.category}</p>
+                    <p className="font-medium text-gray-900 text-sm">{s.name}</p>
+                    <p className="text-xs text-gray-500 capitalize">{s.category}</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">{s.data.length}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">points</p>
+                  <p className="text-sm font-semibold text-gray-700">{s.data.length}</p>
+                  <p className="text-xs text-gray-500">points</p>
                 </div>
               </div>
             ))}
@@ -217,18 +217,18 @@ export default async function QuantViewDashboard() {
         </div>
 
         {/* Footer Info */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="text-center">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
               Enhanced Multi-Series Dashboard
             </h3>
-            <p className="text-gray-600 dark:text-gray-400 max-w-4xl mx-auto">
+            <p className="text-gray-600 max-w-4xl mx-auto">
               This comprehensive financial dashboard combines Treasury yields, inflation data (CPI), and market 
               volatility indicators (VIX & GVZ) in one interactive chart. Users can easily compare and analyze 
               relationships between bond markets, inflation trends, and market sentiment with smart default 
               selections and intuitive filtering capabilities.
             </p>
-            <div className="mt-4 flex items-center justify-center space-x-6 text-sm text-gray-500 dark:text-gray-400">
+            <div className="mt-4 flex items-center justify-center space-x-6 text-sm text-gray-500">
               <span>Built with Next.js 15</span>
               <span>•</span>
               <span>Styled with Tailwind CSS</span>
@@ -244,9 +244,9 @@ export default async function QuantViewDashboard() {
       </main>
 
       {/* Copyright Footer */}
-      <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+      <footer className="bg-white border-t border-gray-200">
         <div className="mx-auto px-6 sm:px-8 lg:px-12 py-4">
-          <div className="text-center text-sm text-gray-600 dark:text-gray-400">
+          <div className="text-center text-sm text-gray-600">
             © {new Date().getFullYear()} Rohit Dhiman. All rights reserved.
           </div>
         </div>
