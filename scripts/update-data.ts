@@ -1,7 +1,8 @@
 import fs from 'fs/promises'
 import path from 'path'
 import { fredClient, DateUtils } from '../lib/fred-client'
-import { TREASURY_YIELD_SERIES, FRED_CONFIG } from '../lib/fred-config'
+import { ALL_SERIES, TREASURY_YIELD_SERIES, INFLATION_SERIES, EMPLOYMENT_SERIES, COMMODITY_SERIES, CURRENCY_SERIES, FRED_CONFIG } from '../lib/fred-config'
+import { interpolateMonthlyToDaily, calculateInflationRate, updateInterpolatedData } from '../lib/interpolation'
 import type { DataMetadata, DataPoint } from './fetch-initial-data'
 
 /**
@@ -32,12 +33,33 @@ async function updateData(): Promise<{
       // If no metadata exists, fall back to initial data fetch
       const { fetchInitialData } = await import('./fetch-initial-data')
       await fetchInitialData()
-      return { updated: true, seriesUpdated: TREASURY_YIELD_SERIES.map(s => s.key), newRecords: 0 }
+      return { updated: true, seriesUpdated: ALL_SERIES.map(s => s.key), newRecords: 0 }
     }
 
     const today = DateUtils.getToday()
     
-    for (const series of TREASURY_YIELD_SERIES) {
+    // Collect treasury yield dates for CPI interpolation alignment
+    console.log('📊 Collecting treasury yield dates for CPI alignment...')
+    const treasuryDates = new Set<string>()
+    
+    for (const treasurySeries of TREASURY_YIELD_SERIES) {
+      const treasuryInfo = metadata.seriesInfo[treasurySeries.key]
+      if (treasuryInfo) {
+        try {
+          const dataPath = path.join(FRED_CONFIG.dataDir, `${treasurySeries.key}.json`)
+          const existingContent = await fs.readFile(dataPath, 'utf-8')
+          const existingData: DataPoint[] = JSON.parse(existingContent)
+          existingData.forEach(point => treasuryDates.add(point.date))
+        } catch (error) {
+          console.warn(`⚠️ Could not read ${treasurySeries.key} for date alignment`)
+        }
+      }
+    }
+    
+    const sortedTreasuryDates = Array.from(treasuryDates).sort()
+    console.log(`📅 Using ${sortedTreasuryDates.length} treasury dates for CPI alignment`)
+    
+    for (const series of ALL_SERIES) {
       try {
         const seriesInfo = metadata.seriesInfo[series.key]
         
@@ -71,6 +93,156 @@ async function updateData(): Promise<{
 
         console.log(`📈 Found ${newData.length} new records for ${series.name}`)
 
+        // Transform new data
+        let transformedNewData: DataPoint[] = newData.map(point => ({
+          date: point.date,
+          value: typeof point.value === 'string' ? parseFloat(point.value) : point.value
+        }))
+
+        // Skip yield curve spread - it's calculated separately
+        if (series.key === 'yield_curve_spread') {
+          continue
+        }
+
+        // Handle inflation data specially
+        if (series.category === 'inflation') {
+          console.log(`🔄 Processing new inflation data for ${series.name}...`)
+          
+          // Read existing raw monthly data
+          const rawDataPath = path.join(FRED_CONFIG.dataDir, `${series.key}_monthly.json`)
+          let existingRawData: DataPoint[] = []
+          
+          try {
+            const rawContent = await fs.readFile(rawDataPath, 'utf-8')
+            existingRawData = JSON.parse(rawContent)
+          } catch (error) {
+            console.log(`⚠️ Could not read existing raw monthly data for ${series.name}`)
+          }
+
+          // Merge with existing raw data
+          const allRawData = [...existingRawData, ...transformedNewData]
+          const uniqueRawData = allRawData.reduce((acc, current) => {
+            const existingIndex = acc.findIndex(item => item.date === current.date)
+            if (existingIndex >= 0) {
+              acc[existingIndex] = current
+            } else {
+              acc.push(current)
+            }
+            return acc
+          }, [] as DataPoint[])
+
+          // Sort by date
+          uniqueRawData.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+
+          // Save updated raw monthly data
+          await fs.writeFile(rawDataPath, JSON.stringify(uniqueRawData, null, 2))
+
+          // Calculate inflation rate from all CPI data
+          const inflationRateData = calculateInflationRate(uniqueRawData)
+          
+          // Re-interpolate to daily business days using treasury dates
+          if (series.requiresInterpolation) {
+            transformedNewData = interpolateMonthlyToDaily(
+              inflationRateData,
+              FRED_CONFIG.defaultStartDate,
+              today,
+              sortedTreasuryDates
+            )
+            console.log(`📈 Re-interpolated to match treasury dates: ${transformedNewData.length} total records`)
+            
+            // For inflation data, we replace the entire interpolated dataset
+            // rather than appending, since interpolation affects all dates
+            const dataPath = path.join(FRED_CONFIG.dataDir, `${series.key}.json`)
+            await fs.writeFile(dataPath, JSON.stringify(transformedNewData, null, 2))
+            
+            // Update metadata
+            metadata.seriesInfo[series.key] = {
+              ...seriesInfo,
+              latestDate: transformedNewData[transformedNewData.length - 1].date,
+              recordCount: transformedNewData.length
+            }
+
+            seriesUpdated.push(series.key)
+            totalNewRecords += newData.length // Count original new monthly records
+            updated = true
+
+            console.log(`✅ ${series.name}: Re-interpolated with ${newData.length} new monthly records`)
+            console.log(`   Latest data: ${metadata.seriesInfo[series.key].latestDate}`)
+            console.log(`   Total interpolated records: ${metadata.seriesInfo[series.key].recordCount}`)
+            
+            continue // Skip the normal processing below
+          } else {
+            transformedNewData = inflationRateData
+          }
+        }
+
+        // Handle employment data specially (similar to inflation)
+        if (series.category === 'employment') {
+          console.log(`🔄 Processing new employment data for ${series.name}...`)
+          
+          // Read existing raw monthly data
+          const rawDataPath = path.join(FRED_CONFIG.dataDir, `${series.key}_monthly.json`)
+          let existingRawData: DataPoint[] = []
+          
+          try {
+            const rawContent = await fs.readFile(rawDataPath, 'utf-8')
+            existingRawData = JSON.parse(rawContent)
+          } catch (error) {
+            console.log(`⚠️ Could not read existing raw monthly data for ${series.name}`)
+          }
+
+          // Merge with existing raw data
+          const allRawData = [...existingRawData, ...transformedNewData]
+          const uniqueRawData = allRawData.reduce((acc, current) => {
+            const existingIndex = acc.findIndex(item => item.date === current.date)
+            if (existingIndex >= 0) {
+              acc[existingIndex] = current
+            } else {
+              acc.push(current)
+            }
+            return acc
+          }, [] as DataPoint[])
+
+          // Sort by date
+          uniqueRawData.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+
+          // Save updated raw monthly data
+          await fs.writeFile(rawDataPath, JSON.stringify(uniqueRawData, null, 2))
+          
+          // Re-interpolate to daily business days using treasury dates
+          if (series.requiresInterpolation) {
+            transformedNewData = interpolateMonthlyToDaily(
+              uniqueRawData,
+              FRED_CONFIG.defaultStartDate,
+              today,
+              sortedTreasuryDates
+            )
+            console.log(`📈 Re-interpolated to match treasury dates: ${transformedNewData.length} total records`)
+            
+            // Replace the entire interpolated dataset
+            const dataPath = path.join(FRED_CONFIG.dataDir, `${series.key}.json`)
+            await fs.writeFile(dataPath, JSON.stringify(transformedNewData, null, 2))
+            
+            // Update metadata
+            metadata.seriesInfo[series.key] = {
+              ...seriesInfo,
+              latestDate: transformedNewData[transformedNewData.length - 1].date,
+              recordCount: transformedNewData.length
+            }
+
+            seriesUpdated.push(series.key)
+            totalNewRecords += newData.length
+            updated = true
+
+            console.log(`✅ ${series.name}: Re-interpolated with ${newData.length} new monthly records`)
+            console.log(`   Latest data: ${metadata.seriesInfo[series.key].latestDate}`)
+            console.log(`   Total interpolated records: ${metadata.seriesInfo[series.key].recordCount}`)
+            
+            continue // Skip the normal processing below
+          }
+        }
+
+        // Normal processing for treasury yields and non-interpolated data
         // Read existing data
         const dataPath = path.join(FRED_CONFIG.dataDir, `${series.key}.json`)
         let existingData: DataPoint[] = []
@@ -81,12 +253,6 @@ async function updateData(): Promise<{
         } catch (error) {
           console.log(`⚠️ Could not read existing data for ${series.name}, starting fresh...`)
         }
-
-        // Transform and merge new data
-        const transformedNewData: DataPoint[] = newData.map(point => ({
-          date: point.date,
-          value: typeof point.value === 'string' ? parseFloat(point.value) : point.value
-        }))
 
         // Remove duplicates and merge
         const existingDates = new Set(existingData.map(d => d.date))
@@ -123,6 +289,64 @@ async function updateData(): Promise<{
       } catch (error) {
         console.error(`❌ Error updating ${series.name}:`, error)
         // Continue with other series even if one fails
+      }
+    }
+
+    // Calculate yield curve spread (10Y - 2Y) if either treasury series was updated
+    const treasury10yUpdated = seriesUpdated.includes('treasury_10y')
+    const treasury2yUpdated = seriesUpdated.includes('treasury_2y')
+    
+    if (treasury10yUpdated || treasury2yUpdated) {
+      console.log('📊 Recalculating 10Y-2Y yield curve spread...')
+      
+      try {
+        // Read current treasury data
+        const treasury10yPath = path.join(FRED_CONFIG.dataDir, 'treasury_10y.json')
+        const treasury2yPath = path.join(FRED_CONFIG.dataDir, 'treasury_2y.json')
+        
+        const treasury10yContent = await fs.readFile(treasury10yPath, 'utf-8')
+        const treasury2yContent = await fs.readFile(treasury2yPath, 'utf-8')
+        
+        const treasury10y: DataPoint[] = JSON.parse(treasury10yContent)
+        const treasury2y: DataPoint[] = JSON.parse(treasury2yContent)
+        
+        // Create a map for efficient lookup
+        const treasury2yMap = new Map(treasury2y.map(d => [d.date, d.value]))
+        
+        const yieldSpreadData: DataPoint[] = treasury10y
+          .map(point10y => {
+            const value2y = treasury2yMap.get(point10y.date)
+            if (value2y !== undefined) {
+              return {
+                date: point10y.date,
+                value: point10y.value - value2y
+              }
+            }
+            return null
+          })
+          .filter((point): point is DataPoint => point !== null)
+        
+        // Save yield curve spread data
+        const spreadFilepath = path.join(FRED_CONFIG.dataDir, 'yield_curve_spread.json')
+        await fs.writeFile(spreadFilepath, JSON.stringify(yieldSpreadData, null, 2))
+        
+        // Update metadata
+        metadata.seriesInfo['yield_curve_spread'] = {
+          latestDate: yieldSpreadData[yieldSpreadData.length - 1]?.date || FRED_CONFIG.defaultStartDate,
+          recordCount: yieldSpreadData.length,
+          fredSeriesId: 'T10Y2Y (calculated)'
+        }
+        
+        if (!seriesUpdated.includes('yield_curve_spread')) {
+          seriesUpdated.push('yield_curve_spread')
+        }
+        updated = true
+        
+        console.log(`✅ 10Y-2Y Yield Spread: ${yieldSpreadData.length} records calculated`)
+        console.log(`   Latest data: ${metadata.seriesInfo['yield_curve_spread'].latestDate}`)
+        
+      } catch (error) {
+        console.warn('⚠️  Could not calculate yield curve spread:', error)
       }
     }
 
