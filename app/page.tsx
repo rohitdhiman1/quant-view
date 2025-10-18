@@ -38,6 +38,8 @@ export default async function QuantViewDashboard() {
     { key: 'unemployment_rate', filename: 'unemployment_rate.json' },
     { key: 'oil_price', filename: 'oil_price.json' },
     { key: 'dollar_index', filename: 'dollar_index.json' },
+    { key: 'eur_usd', filename: 'eur_usd.json' },
+    { key: 'sp500', filename: 'sp500.json' },
     { key: 'yield_curve_spread', filename: 'yield_curve_spread.json' }
   ]
 
@@ -94,7 +96,7 @@ export default async function QuantViewDashboard() {
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Quant View</h1>
               <p className="mt-1 text-sm text-gray-600">
-                Multi-Series Financial Analytics Dashboard
+                Macro-Economic Data Platform
               </p>
             </div>
             <HeaderActions formattedBuildTime={formattedBuildTime} />
@@ -187,7 +189,7 @@ export default async function QuantViewDashboard() {
         <div className="mb-8">
           <MultiSeriesChartComponent 
             data={multiSeriesData}
-            title="Comprehensive Financial Markets Analysis"
+            title="Key Economic Indicators"
           />
         </div>
 
