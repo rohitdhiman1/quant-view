@@ -52,6 +52,8 @@ const CustomTooltip = ({ active, payload, label, seriesConfigs = [] }: CustomToo
           let formattedValue = ''
           if (unit === '$/barrel') {
             formattedValue = `$${entry.value.toFixed(2)}`
+          } else if (unit === 'USD') {
+            formattedValue = `$${entry.value.toFixed(4)}`
           } else if (unit === 'Index') {
             formattedValue = entry.value.toFixed(2)
           } else if (unit === '%') {
@@ -95,7 +97,7 @@ export default function MultiSeriesChartComponent({
   
   // Helper function to determine if a metric uses absolute values
   const isAbsoluteMetric = (unit: string) => {
-    return unit === '$/barrel' || unit === 'Index'
+    return unit === '$/barrel' || unit === 'Index' || unit === 'USD'
   }
   
   // Helper function to determine if a metric uses percentage values
@@ -326,7 +328,7 @@ export default function MultiSeriesChartComponent({
                                     category === 'economic_indicators' ? 'Economic Indicators' :
                                     'Other'
                 
-                const categoryIcon = category === 'yields' ? '📊' :
+                const categoryIcon = category === 'yields' ? '🏛️' :
                                     category === 'inflation' ? '📈' :
                                     category === 'volatility' ? '⚡' :
                                     category === 'employment' ? '👥' :
@@ -350,7 +352,7 @@ export default function MultiSeriesChartComponent({
                           {categoryName}
                         </div>
                         <div className="text-[10px] text-gray-500">
-                          {selectedCount > 0 ? `${selectedCount} sel` : `${seriesGroup.length} avail`}
+                          {selectedCount > 0 ? `${selectedCount} selected` : `${seriesGroup.length} available`}
                         </div>
                       </div>
                       <div className="absolute top-1.5 right-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -428,10 +430,10 @@ export default function MultiSeriesChartComponent({
                 )
                 .map(([category, seriesGroup]) => {
                   const categoryName = category === 'commodities' ? 'Commodities' :
-                                      category === 'currency' ? 'Currency & FX' : 'Other'
+                                      category === 'currency' ? 'Markets & FX' : 'Other'
                   
                   const categoryIcon = category === 'commodities' ? '🛢️' :
-                                      category === 'currency' ? '💵' : '📋'
+                                      category === 'currency' ? '📊' : '📋'
                   
                   const selectedCount = seriesGroup.filter(s => visibleSeries.has(s.key)).length
                   const hasSelected = selectedCount > 0
@@ -451,7 +453,7 @@ export default function MultiSeriesChartComponent({
                             {categoryName}
                           </div>
                           <div className="text-[10px] text-gray-500">
-                            {selectedCount > 0 ? `${selectedCount} sel` : `${seriesGroup.length} avail`}
+                            {selectedCount > 0 ? `${selectedCount} selected` : `${seriesGroup.length} available`}
                           </div>
                         </div>
                         <div className="absolute top-1.5 right-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -526,6 +528,8 @@ export default function MultiSeriesChartComponent({
               let formattedValue = ''
               if (unit === '$/barrel') {
                 formattedValue = `$${item.value.toFixed(2)}`
+              } else if (unit === 'USD') {
+                formattedValue = `$${item.value.toFixed(4)}`
               } else if (unit === 'Index') {
                 formattedValue = item.value.toFixed(2)
               } else if (unit === '%') {

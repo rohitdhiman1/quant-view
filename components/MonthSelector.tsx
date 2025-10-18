@@ -121,7 +121,7 @@ export default function MonthSelector({
     <div className="space-y-3">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-gray-700">Select Months</h3>
+  <h3 className="text-sm font-semibold text-gray-700">Select Months</h3>
         <div className="flex items-center gap-2">
           <button
             onClick={handleSelectAll}
