@@ -121,20 +121,20 @@ export default function MonthSelector({
     <div className="space-y-3">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Select Months</h3>
+        <h3 className="text-sm font-semibold text-gray-700">Select Months</h3>
         <div className="flex items-center gap-2">
           <button
             onClick={handleSelectAll}
             disabled={disabled || selectedMonths.length === MONTHS.filter(m => !getMonthDisabledState(m.value)).length}
-            className="text-xs font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors duration-200"
+            className="text-xs font-medium text-blue-600 hover:text-blue-800 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors duration-200"
           >
             Select All
           </button>
-          <span className="text-gray-300 dark:text-gray-600">•</span>
+          <span className="text-gray-300">•</span>
           <button
             onClick={handleClearAll}
             disabled={disabled || selectedMonths.length === 0}
-            className="text-xs font-medium text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors duration-200"
+            className="text-xs font-medium text-red-600 hover:text-red-800 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors duration-200"
           >
             Clear All
           </button>
@@ -156,8 +156,8 @@ export default function MonthSelector({
                 ${isSelected && !isDisabled
                   ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-md shadow-blue-500/30 border-2 border-blue-400'
                   : isDisabled
-                  ? 'bg-gray-100 dark:bg-gray-700/50 text-gray-300 dark:text-gray-600 border-2 border-gray-200 dark:border-gray-700 cursor-not-allowed opacity-50'
-                  : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-2 border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 hover:shadow-sm hover:bg-blue-50 dark:hover:bg-blue-900/20 cursor-pointer'
+                  ? 'bg-gray-100 text-gray-300 border-2 border-gray-200 cursor-not-allowed opacity-50'
+                  : 'bg-white text-gray-700 border-2 border-gray-200 hover:border-blue-300 hover:shadow-sm hover:bg-blue-50 cursor-pointer'
                 }
                 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1
                 ${!isDisabled && !isSelected ? 'hover:scale-105' : ''}
@@ -173,14 +173,14 @@ export default function MonthSelector({
 
       {/* Selection Summary - Compact */}
       {selectedMonths.length > 0 && (
-        <div className="flex items-center justify-between bg-white dark:bg-gray-800 border border-blue-200 dark:border-blue-800 rounded-lg px-3 py-2">
+        <div className="flex items-center justify-between bg-white border border-blue-200 rounded-lg px-3 py-2">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-            <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
+            <span className="text-xs font-medium text-gray-700">
               {getSelectionSummary()}
             </span>
           </div>
-          <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+          <div className="text-xs text-gray-500 font-medium">
             ~{Math.round(selectedMonths.length * 21.7)} pts
           </div>
         </div>

@@ -111,32 +111,40 @@ export default function MultiSeriesChartComponent({
     return { hasAbsolute, hasPercentage }
   }, [data.series, visibleSeries])
   
-  // Year filtering for daily data
-  const [selectedYear, setSelectedYear] = useState<string>(() => {
+  // Year filtering for daily data - now supports multiple years
+  const [selectedYears, setSelectedYears] = useState<Set<string>>(() => {
     const currentYear = new Date().getFullYear()
-    return currentYear.toString()
+    return new Set([currentYear.toString()])
   })
   
   // Month filtering for enhanced focus - default to current month
+  // Disabled when multiple years are selected
   const [selectedMonths, setSelectedMonths] = useState<number[]>(() => {
     const currentMonth = new Date().getMonth() + 1 // 1-based month
     return [currentMonth]
   })
   
-  // Get available months for the selected year (currently unused but ready for future enhancements)
+  // Check if multiple years are selected (disables month selection)
+  const isMultiYearSelection = selectedYears.size > 1
+  
+  // Get available months for the selected year (only when single year is selected)
   const availableMonths = useMemo(() => {
+    if (isMultiYearSelection) return []
+    
     const months = new Set<number>()
+    const singleYear = Array.from(selectedYears)[0]
+    
     data.series.forEach(series => {
       series.data.forEach(point => {
         const date = new Date(point.date)
         const year = date.getFullYear().toString()
-        if (year === selectedYear) {
+        if (year === singleYear) {
           months.add(date.getMonth() + 1) // 1-based month
         }
       })
     })
     return Array.from(months).sort()
-  }, [data.series, selectedYear])
+  }, [data.series, selectedYears, isMultiYearSelection])
   
   // Get available years from data
   const availableYears = useMemo(() => {
@@ -160,11 +168,11 @@ export default function MultiSeriesChartComponent({
         const pointYear = date.getFullYear().toString()
         const pointMonth = date.getMonth() + 1 // 1-based month
         
-        // Filter by selected year
-        if (pointYear !== selectedYear) return
+        // Filter by selected years
+        if (!selectedYears.has(pointYear)) return
         
-        // Filter by selected months (if any months are selected)
-        if (selectedMonths.length > 0 && !selectedMonths.includes(pointMonth)) return
+        // Filter by selected months (only if single year is selected and months are specified)
+        if (!isMultiYearSelection && selectedMonths.length > 0 && !selectedMonths.includes(pointMonth)) return
         
         if (!dateMap.has(point.date)) {
           dateMap.set(point.date, { date: point.date })
@@ -180,7 +188,7 @@ export default function MultiSeriesChartComponent({
     )
     
     return sortedData
-  }, [data.series, selectedYear, selectedMonths])
+  }, [data.series, selectedYears, selectedMonths, isMultiYearSelection])
 
   const toggleSeries = (seriesKey: string) => {
     const series = data.series.find(s => s.key === seriesKey)
@@ -220,9 +228,9 @@ export default function MultiSeriesChartComponent({
 
   const visibleSeriesConfigs = data.series.filter(s => visibleSeries.has(s.key))
   const currentValues = visibleSeriesConfigs.map(series => {
-    // Get latest data for selected year
+    // Get latest data for selected years
     const yearData = series.data.filter(point => 
-      new Date(point.date).getFullYear().toString() === selectedYear
+      selectedYears.has(new Date(point.date).getFullYear().toString())
     )
     const latestData = yearData[yearData.length - 1]
     return {
@@ -232,13 +240,13 @@ export default function MultiSeriesChartComponent({
     }
   })
 
-  // Calculate Y-axis domain based on visible data for selected year
+  // Calculate Y-axis domain based on visible data for selected years
   const yAxisDomain = useMemo(() => {
     if (visibleSeriesConfigs.length === 0) return [0, 10]
     
     const allVisibleValues = visibleSeriesConfigs.flatMap(series => 
       series.data
-        .filter(point => new Date(point.date).getFullYear().toString() === selectedYear)
+        .filter(point => selectedYears.has(new Date(point.date).getFullYear().toString()))
         .map(point => point.value)
     ).filter(val => typeof val === 'number' && !isNaN(val))
     
@@ -252,7 +260,7 @@ export default function MultiSeriesChartComponent({
       Math.max(0, minVal - padding),
       maxVal + padding
     ]
-  }, [visibleSeriesConfigs, selectedYear, selectedMonths])
+  }, [visibleSeriesConfigs, selectedYears, selectedMonths])
 
   // Group series by category for better organization
   const seriesByCategory = data.series.reduce((acc, series) => {
@@ -264,11 +272,11 @@ export default function MultiSeriesChartComponent({
   }, {} as Record<string, SeriesConfig[]>)
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 p-6 hover:shadow-xl transition-shadow duration-300">
+    <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-shadow duration-300">
       {/* Chart Header */}
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">{title}</h2>
-        <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+        <h2 className="text-2xl font-bold text-gray-800 mb-2">{title}</h2>
+        <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
           <span>Interactive Multi-Series Analysis</span>
           <span>•</span>
           <span>{data.dateRange.start} to {data.dateRange.end}</span>
@@ -278,16 +286,16 @@ export default function MultiSeriesChartComponent({
       {/* Series Selection - Compact Horizontal Layout */}
       <div className="mb-6">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Select Data Series</h3>
+          <h3 className="text-sm font-semibold text-gray-700">Select Data Series</h3>
           {(selectedMetricTypes.hasAbsolute || selectedMetricTypes.hasPercentage) && (
-            <div className="text-xs text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-3 py-1 rounded-full font-medium">
+            <div className="text-xs text-blue-600 bg-blue-50 px-3 py-1 rounded-full font-medium">
               {selectedMetricTypes.hasAbsolute ? 'Absolute values selected' : 'Percentage values selected'}
             </div>
           )}
         </div>
         {(selectedMetricTypes.hasAbsolute && selectedMetricTypes.hasPercentage) === false && 
          (selectedMetricTypes.hasAbsolute || selectedMetricTypes.hasPercentage) && (
-          <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+          <p className="text-xs text-gray-500 mb-3">
             💡 {selectedMetricTypes.hasAbsolute 
               ? 'Percentage metrics are disabled while absolute metrics are selected.' 
               : 'Absolute metrics are disabled while percentage metrics are selected.'
@@ -300,7 +308,7 @@ export default function MultiSeriesChartComponent({
           {/* Percentage Metrics */}
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
-              <div className="flex items-center gap-1.5 px-2 py-0.5 bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 rounded-md text-[10px] font-bold">
+              <div className="flex items-center gap-1.5 px-2 py-0.5 bg-blue-100 text-blue-700 rounded-md text-[10px] font-bold">
                 <span>%</span>
                 <span>PERCENTAGE</span>
               </div>
@@ -332,31 +340,31 @@ export default function MultiSeriesChartComponent({
                     <div className={`
                       relative overflow-hidden rounded-lg border-2 transition-all duration-200 cursor-pointer
                       ${hasSelected 
-                        ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30 shadow-sm' 
-                        : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-blue-300 dark:hover:border-blue-600 hover:shadow-md'
+                        ? 'border-blue-500 bg-blue-50 shadow-sm' 
+                        : 'border-gray-200 bg-white hover:border-blue-300 hover:shadow-md'
                       }
                     `}>
                       <div className="p-3">
                         <div className="text-xl mb-1.5">{categoryIcon}</div>
-                        <div className="text-[10px] font-bold text-gray-700 dark:text-gray-300 mb-0.5 leading-tight uppercase tracking-wide">
+                        <div className="text-[10px] font-bold text-gray-700 mb-0.5 leading-tight uppercase tracking-wide">
                           {categoryName}
                         </div>
-                        <div className="text-[10px] text-gray-500 dark:text-gray-400">
+                        <div className="text-[10px] text-gray-500">
                           {selectedCount > 0 ? `${selectedCount} sel` : `${seriesGroup.length} avail`}
                         </div>
                       </div>
                       <div className="absolute top-1.5 right-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <svg className="w-3 h-3 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-3 h-3 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                         </svg>
                       </div>
                     </div>
 
-                    <div className="absolute left-0 top-full mt-2 w-72 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 transform group-hover:translate-y-0 translate-y-2">
+                    <div className="absolute left-0 top-full mt-2 w-72 bg-white border border-gray-200 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 transform group-hover:translate-y-0 translate-y-2">
                       <div className="p-4">
-                        <div className="flex items-center gap-2 mb-3 pb-3 border-b border-gray-100 dark:border-gray-700">
+                        <div className="flex items-center gap-2 mb-3 pb-3 border-b border-gray-100">
                           <span className="text-xl">{categoryIcon}</span>
-                          <h4 className="font-semibold text-gray-900 dark:text-gray-100 text-sm">{categoryName}</h4>
+                          <h4 className="font-semibold text-gray-900 text-sm">{categoryName}</h4>
                         </div>
                         <div className="space-y-2 max-h-64 overflow-y-auto">
                           {seriesGroup.map(series => {
@@ -371,10 +379,10 @@ export default function MultiSeriesChartComponent({
                                 className={`
                                   w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-all duration-200
                                   ${isSelected
-                                    ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-900 dark:text-blue-100 font-medium shadow-sm'
+                                    ? 'bg-blue-100 text-blue-900 font-medium shadow-sm'
                                     : isDisabled
-                                      ? 'bg-gray-50 dark:bg-gray-700/50 text-gray-400 dark:text-gray-500 cursor-not-allowed opacity-50'
-                                      : 'bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 cursor-pointer'
+                                      ? 'bg-gray-50 text-gray-400 cursor-not-allowed opacity-50'
+                                      : 'bg-gray-50 hover:bg-gray-100 text-gray-700 cursor-pointer'
                                   }
                                 `}
                               >
@@ -384,7 +392,7 @@ export default function MultiSeriesChartComponent({
                                 ></div>
                                 <span className="text-xs flex-1">{series.name}</span>
                                 {isSelected && (
-                                  <svg className="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                  <svg className="w-4 h-4 text-blue-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                                   </svg>
                                 )}
@@ -402,13 +410,13 @@ export default function MultiSeriesChartComponent({
 
           {/* Vertical Divider */}
           <div className="flex flex-col items-center px-2 self-stretch">
-            <div className="w-px flex-1 bg-gradient-to-b from-transparent via-gray-300 dark:via-gray-600 to-transparent"></div>
+            <div className="w-px flex-1 bg-gradient-to-b from-transparent via-gray-300 to-transparent"></div>
           </div>
 
           {/* Absolute Metrics */}
           <div className="flex-shrink-0" style={{ width: '280px' }}>
             <div className="flex items-center gap-2 mb-2">
-              <div className="flex items-center gap-1.5 px-2 py-0.5 bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 rounded-md text-[10px] font-bold">
+              <div className="flex items-center gap-1.5 px-2 py-0.5 bg-green-100 text-green-700 rounded-md text-[10px] font-bold">
                 <span>#</span>
                 <span>ABSOLUTE</span>
               </div>
@@ -433,31 +441,31 @@ export default function MultiSeriesChartComponent({
                       <div className={`
                         relative overflow-hidden rounded-lg border-2 transition-all duration-200 cursor-pointer
                         ${hasSelected 
-                          ? 'border-green-500 bg-green-50 dark:bg-green-900/30 shadow-sm' 
-                          : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-green-300 dark:hover:border-green-600 hover:shadow-md'
+                          ? 'border-green-500 bg-green-50 shadow-sm' 
+                          : 'border-gray-200 bg-white hover:border-green-300 hover:shadow-md'
                         }
                       `}>
                         <div className="p-3">
                           <div className="text-xl mb-1.5">{categoryIcon}</div>
-                          <div className="text-[10px] font-bold text-gray-700 dark:text-gray-300 mb-0.5 leading-tight uppercase tracking-wide">
+                          <div className="text-[10px] font-bold text-gray-700 mb-0.5 leading-tight uppercase tracking-wide">
                             {categoryName}
                           </div>
-                          <div className="text-[10px] text-gray-500 dark:text-gray-400">
+                          <div className="text-[10px] text-gray-500">
                             {selectedCount > 0 ? `${selectedCount} sel` : `${seriesGroup.length} avail`}
                           </div>
                         </div>
                         <div className="absolute top-1.5 right-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <svg className="w-3 h-3 text-green-500 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-3 h-3 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                           </svg>
                         </div>
                       </div>
 
-                      <div className="absolute left-0 top-full mt-2 w-64 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 transform group-hover:translate-y-0 translate-y-2">
+                      <div className="absolute left-0 top-full mt-2 w-64 bg-white border border-gray-200 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 transform group-hover:translate-y-0 translate-y-2">
                         <div className="p-3">
-                          <div className="flex items-center gap-2 mb-2 pb-2 border-b border-gray-100 dark:border-gray-700">
+                          <div className="flex items-center gap-2 mb-2 pb-2 border-b border-gray-100">
                             <span className="text-lg">{categoryIcon}</span>
-                            <h4 className="font-semibold text-gray-900 dark:text-gray-100 text-xs">{categoryName}</h4>
+                            <h4 className="font-semibold text-gray-900 text-xs">{categoryName}</h4>
                           </div>
                           <div className="space-y-1.5 max-h-60 overflow-y-auto">
                             {seriesGroup.map(series => {
@@ -472,10 +480,10 @@ export default function MultiSeriesChartComponent({
                                   className={`
                                     w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-left transition-all duration-150
                                     ${isSelected
-                                      ? 'bg-green-100 dark:bg-green-900/40 text-green-900 dark:text-green-100 font-medium shadow-sm'
+                                      ? 'bg-green-100 text-green-900 font-medium shadow-sm'
                                       : isDisabled
-                                        ? 'bg-gray-50 dark:bg-gray-700/50 text-gray-400 dark:text-gray-500 cursor-not-allowed opacity-50'
-                                        : 'bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 cursor-pointer'
+                                        ? 'bg-gray-50 text-gray-400 cursor-not-allowed opacity-50'
+                                        : 'bg-gray-50 hover:bg-gray-100 text-gray-700 cursor-pointer'
                                     }
                                   `}
                                 >
@@ -507,8 +515,8 @@ export default function MultiSeriesChartComponent({
 
       {/* Current Values Display */}
       {currentValues.length > 0 && (
-        <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Current Values</h3>
+        <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+          <h3 className="text-sm font-semibold text-gray-700 mb-2">Current Values</h3>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             {currentValues.map(item => {
               // Find the series config to get the correct unit
@@ -532,7 +540,7 @@ export default function MultiSeriesChartComponent({
                     className="w-3 h-3 rounded-full" 
                     style={{ backgroundColor: item.color }}
                   ></div>
-                  <span className="text-xs text-gray-600 dark:text-gray-400 truncate">{item.name}</span>
+                  <span className="text-xs text-gray-600 truncate">{item.name}</span>
                   <span className="text-sm font-semibold" style={{ color: item.color }}>
                     {formattedValue}
                   </span>
@@ -544,27 +552,50 @@ export default function MultiSeriesChartComponent({
       )}
 
       {/* Time Period Selection - Modern Compact Design */}
-      <div className="mb-8 bg-gradient-to-br from-slate-50 to-blue-50 dark:from-gray-800 dark:to-gray-700 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
+      <div className="mb-8 bg-gradient-to-br from-slate-50 to-blue-50 rounded-2xl border border-gray-200 p-6 shadow-sm">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Year Selection */}
           <div className="lg:col-span-5">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Select Year</h3>
-              <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+              <h3 className="text-sm font-semibold text-gray-700">Select Year(s)</h3>
+              <div className="flex items-center gap-2 text-xs text-gray-500">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
                 <span>{combinedData.length} data points</span>
               </div>
             </div>
+            {isMultiYearSelection && (
+              <div className="mb-3 text-xs text-blue-600 bg-blue-50 px-3 py-2 rounded-lg font-medium flex items-center gap-2">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Multi-year mode: Month selection disabled
+              </div>
+            )}
             <div className="grid grid-cols-4 gap-2">
               {availableYears.map(year => {
-                const isSelected = selectedYear === year
+                const isSelected = selectedYears.has(year)
                 const isCurrent = year === new Date().getFullYear().toString()
                 return (
                   <button
                     key={year}
-                    onClick={() => setSelectedYear(year)}
+                    onClick={() => {
+                      const newYears = new Set(selectedYears)
+                      if (isSelected) {
+                        // Don't allow deselecting if it's the only year selected
+                        if (newYears.size > 1) {
+                          newYears.delete(year)
+                        }
+                      } else {
+                        newYears.add(year)
+                        // When switching to multi-year, clear month selection
+                        if (newYears.size > 1) {
+                          setSelectedMonths([])
+                        }
+                      }
+                      setSelectedYears(newYears)
+                    }}
                     className={`
                       group relative px-4 py-3 text-sm font-semibold rounded-xl transition-all duration-300 ease-out
                       ${isSelected
@@ -584,7 +615,14 @@ export default function MultiSeriesChartComponent({
                       )}
                     </span>
                     {isSelected && (
-                      <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-blue-500 rounded-xl opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
+                      <>
+                        <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-blue-500 rounded-xl opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
+                        <div className="absolute top-1 right-1">
+                          <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                      </>
                     )}
                   </button>
                 )
@@ -599,9 +637,9 @@ export default function MultiSeriesChartComponent({
               onMonthsChange={(months) => {
                 setSelectedMonths(months)
               }}
-              disabled={false}
+              disabled={isMultiYearSelection}
               availableMonths={availableMonths}
-              selectedYear={selectedYear}
+              selectedYear={Array.from(selectedYears)[0]}
             />
           </div>
         </div>
@@ -635,6 +673,11 @@ export default function MultiSeriesChartComponent({
                 tickLine={false}
                 tick={{ fontSize: 11, fill: '#6b7280' }}
                 tickCount={(() => {
+                  // Multi-year mode: Show quarterly markers
+                  if (isMultiYearSelection) {
+                    return Math.max(6, Math.min(12, Math.floor(combinedData.length / 60)))
+                  }
+                  
                   if (selectedMonths.length === 0) return 6 // Full year - quarterly view
                   if (selectedMonths.length === 1) return 6 // Single month - weekly view
                   if (selectedMonths.length <= 2) return 8 // 2 months - bi-weekly view
@@ -645,7 +688,31 @@ export default function MultiSeriesChartComponent({
                 tickFormatter={(value) => {
                   const date = new Date(value)
                   
-                  // No months selected (full year): Show month only for better spacing
+                  // Multi-year mode: Always show Month + Year for clarity
+                  if (isMultiYearSelection) {
+                    const month = date.getMonth()
+                    
+                    // Show full year for January or February for better year identification
+                    if (month === 0 || month === 1) { // Jan or Feb - show full year
+                      return date.toLocaleDateString('en-US', { 
+                        month: 'short',
+                        year: 'numeric'
+                      })
+                    } else if (month % 3 === 0) { // Quarterly markers (Mar, Jun, Sep, Dec)
+                      return date.toLocaleDateString('en-US', { 
+                        month: 'short',
+                        year: '2-digit'
+                      })
+                    } else {
+                      // Other months - show month with 2-digit year for clarity
+                      return date.toLocaleDateString('en-US', { 
+                        month: 'short',
+                        year: '2-digit'
+                      })
+                    }
+                  }
+                  
+                  // No months selected (full single year): Show month only for better spacing
                   if (selectedMonths.length === 0) {
                     return date.toLocaleDateString('en-US', { 
                       month: 'short'
@@ -722,13 +789,22 @@ export default function MultiSeriesChartComponent({
                   })
                 }}
                 interval={(() => {
+                  // Multi-year mode: Use intelligent spacing based on total data points
+                  if (isMultiYearSelection) {
+                    const pointsPerTick = Math.floor(combinedData.length / 12) // Aim for ~12 labels
+                    return Math.max(1, pointsPerTick)
+                  }
+                  
                   if (selectedMonths.length === 0) return Math.max(1, Math.floor(combinedData.length / 6))
                   if (selectedMonths.length >= 7) return Math.max(1, Math.floor(combinedData.length / 4))
                   if (selectedMonths.length >= 5) return Math.max(1, Math.floor(combinedData.length / 5))
                   if (selectedMonths.length >= 3) return Math.max(1, Math.floor(combinedData.length / 6))
                   return 'preserveStartEnd'
                 })()}
-                minTickGap={35}
+                minTickGap={40}
+                angle={isMultiYearSelection ? -45 : 0}
+                textAnchor={isMultiYearSelection ? 'end' : 'middle'}
+                height={isMultiYearSelection ? 70 : 30}
               />
               
               {/* Y Axis */}
