@@ -41,10 +41,10 @@ export interface SeriesConfig {
   data: DataSeries;
   /** Whether this series is currently visible */
   visible: boolean;
-  /** Category of the data (yields, inflation, rates, volatility) */
-  category: 'yields' | 'inflation' | 'rates' | 'volatility';
-  /** Unit for display (%, bps, etc.) */
-  unit: '%';
+  /** Category of the data */
+  category: 'yields' | 'inflation' | 'volatility' | 'employment' | 'commodities' | 'currency' | 'economic_indicators';
+  /** Unit for display (%, bps, $, etc.) */
+  unit: string;
 }
 
 /**
@@ -61,21 +61,30 @@ export interface MultiSeriesData {
 }
 
 /**
- * Predefined series configurations
+ * Predefined series configurations with distinct, high-contrast colors
  */
 export const SERIES_CONFIGS: Omit<SeriesConfig, 'data'>[] = [
+  // Treasury Yields
   {
     key: 'treasury_1y',
     name: '1-Year Treasury',
-    color: '#3b82f6', // blue-500
-    visible: true,
+    color: '#2563eb', // bright blue
+    visible: false,
+    category: 'yields',
+    unit: '%'
+  },
+  {
+    key: 'treasury_2y',
+    name: '2-Year Treasury',
+    color: '#0891b2', // cyan-600
+    visible: false,
     category: 'yields',
     unit: '%'
   },
   {
     key: 'treasury_5y',
-    name: '5-Year Treasury',
-    color: '#10b981', // emerald-500
+    name: '5-Year Treasury',    
+    color: '#059669', // emerald green
     visible: true,
     category: 'yields',
     unit: '%'
@@ -83,39 +92,41 @@ export const SERIES_CONFIGS: Omit<SeriesConfig, 'data'>[] = [
   {
     key: 'treasury_10y',
     name: '10-Year Treasury',
-    color: '#f59e0b', // amber-500
-    visible: true,
+    color: '#ea580c', // bright orange
+    visible: false,
     category: 'yields',
     unit: '%'
   },
   {
     key: 'treasury_20y',
     name: '20-Year Treasury',
-    color: '#ef4444', // red-500
-    visible: true,
+    color: '#dc2626', // bright red
+    visible: false,
     category: 'yields',
     unit: '%'
   },
+  // Inflation Metrics
   {
     key: 'cpi',
-    name: 'CPI Inflation Rate',
-    color: '#dc2626', // red-600
-    visible: false,
+    name: 'CPI All Items',
+    color: '#7c2d92', // deep purple
+    visible: true,
     category: 'inflation',
     unit: '%'
   },
   {
-    key: 'fed_rate',
-    name: 'Federal Interest Rate',
-    color: '#16a34a', // green-600
+    key: 'core_cpi',
+    name: 'Core CPI (ex Food & Energy)',
+    color: '#be185d', // hot pink/magenta
     visible: false,
-    category: 'rates',
+    category: 'inflation',
     unit: '%'
   },
+  // Market Volatility
   {
     key: 'vix',
-    name: 'VIX (Volatility Index)',
-    color: '#7c3aed', // violet-600
+    name: 'VIX (S&P 500 Volatility)',
+    color: '#1f2937', // dark gray/charcoal
     visible: false,
     category: 'volatility',
     unit: '%'
@@ -123,9 +134,45 @@ export const SERIES_CONFIGS: Omit<SeriesConfig, 'data'>[] = [
   {
     key: 'gvz',
     name: 'GVZ (Gold Volatility)',
-    color: '#f59e0b', // amber-500
+    color: '#b45309', // brown/bronze (for gold)
     visible: false,
     category: 'volatility',
     unit: '%'
+  },
+  // Economic Indicators
+  {
+    key: 'yield_curve_spread',
+    name: '10Y-2Y Yield Spread',
+    color: '#0d9488', // teal-600
+    visible: false,
+    category: 'economic_indicators',
+    unit: '%'
+  },
+  // Labor Market
+  {
+    key: 'unemployment_rate',
+    name: 'Unemployment Rate',
+    color: '#991b1b', // dark red
+    visible: false,
+    category: 'employment',
+    unit: '%'
+  },
+  // Commodities
+  {
+    key: 'oil_price',
+    name: 'Oil Price (WTI)',
+    color: '#166534', // green-800
+    visible: false,
+    category: 'commodities',
+    unit: '$/barrel'
+  },
+  // Currency & FX
+  {
+    key: 'dollar_index',
+    name: 'US Dollar Index',
+    color: '#581c87', // purple-800
+    visible: false,
+    category: 'currency',
+    unit: 'Index'
   }
 ];
