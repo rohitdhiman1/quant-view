@@ -28,6 +28,7 @@ export interface SeriesConfig {
   category: 'yields' | 'inflation' | 'volatility' | 'employment' | 'commodities' | 'currency' | 'economic_indicators'
   frequency: 'daily' | 'monthly'
   requiresInterpolation?: boolean
+  unit?: string // Unit for display (e.g., '$/barrel', 'Index', '%', 'USD')
 }
 
 export interface TreasuryYieldConfig extends SeriesConfig {
@@ -146,11 +147,12 @@ export const COMMODITY_SERIES: TreasuryYieldConfig[] = [
     fredSeriesId: 'DCOILWTICO',
     color: '#059669', // emerald-600
     category: 'commodities',
-    frequency: 'daily'
+    frequency: 'daily',
+    unit: '$/barrel'
   }
 ]
 
-// FRED Series IDs for Currency Data (Daily)
+// FRED Series IDs for Currency & Market Indices (Daily - Absolute Values)
 export const CURRENCY_SERIES: TreasuryYieldConfig[] = [
   {
     key: 'dollar_index',
@@ -158,7 +160,26 @@ export const CURRENCY_SERIES: TreasuryYieldConfig[] = [
     fredSeriesId: 'DTWEXBGS',
     color: '#7c2d92', // purple-700
     category: 'currency',
-    frequency: 'daily'
+    frequency: 'daily',
+    unit: 'Index'
+  },
+  {
+    key: 'eur_usd',
+    name: 'EUR/USD Exchange Rate',
+    fredSeriesId: 'DEXUSEU',
+    color: '#059669', // emerald-600
+    category: 'currency',
+    frequency: 'daily',
+    unit: 'USD'
+  },
+  {
+    key: 'sp500',
+    name: 'S&P 500 Index',
+    fredSeriesId: 'SP500',
+    color: '#2563eb', // blue-600
+    category: 'currency',
+    frequency: 'daily',
+    unit: 'Index'
   }
 ]
 

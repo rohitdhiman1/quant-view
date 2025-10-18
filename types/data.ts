@@ -166,11 +166,27 @@ export const SERIES_CONFIGS: Omit<SeriesConfig, 'data'>[] = [
     category: 'commodities',
     unit: '$/barrel'
   },
-  // Currency & FX
+  // Currency & Market Indices
   {
     key: 'dollar_index',
     name: 'US Dollar Index',
     color: '#581c87', // purple-800
+    visible: false,
+    category: 'currency',
+    unit: 'Index'
+  },
+  {
+    key: 'eur_usd',
+    name: 'EUR/USD Exchange Rate',
+    color: '#047857', // emerald-700
+    visible: false,
+    category: 'currency',
+    unit: 'USD'
+  },
+  {
+    key: 'sp500',
+    name: 'S&P 500 Index',
+    color: '#1e40af', // blue-700
     visible: false,
     category: 'currency',
     unit: 'Index'
