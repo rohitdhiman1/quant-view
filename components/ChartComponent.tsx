@@ -896,7 +896,7 @@ export default function MultiSeriesChartComponent({
       <div className="mt-4 pt-4 border-t border-gray-100">
         <p className="text-xs text-gray-500 text-center">
           {visibleSeries.size} of {data.series.length} series displayed | 
-          Data spans {combinedData.length} time periods | 
+          {combinedData.length} data points | 
           Interactive analysis dashboard
         </p>
       </div>

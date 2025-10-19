@@ -1,69 +1,144 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { 
-  checkDataFreshness, 
-  triggerDataUpdate, 
-  formatDataAge, 
-  getUpdateStatus,
-  type DataFreshnessInfo
-} from '@/lib/data-refresh'
+import { formatDataAge } from '@/lib/data-refresh'
+
+interface SeriesInfo {
+  latestDate: string
+  recordCount: number
+  fredSeriesId: string
+}
+
+interface SeriesGroup {
+  name: string
+  series: Array<{ key: string; latestDate: string }>
+  latestDate: string
+  color: string
+  emoji: string
+}
 
 export default function CompactDataStatus() {
-  const [freshness, setFreshness] = useState<DataFreshnessInfo | null>(null)
-  const [isUpdating, setIsUpdating] = useState(false)
+  const [lastUpdated, setLastUpdated] = useState<string | null>(null)
+  const [seriesGroups, setSeriesGroups] = useState<SeriesGroup[]>([])
   const [showTooltip, setShowTooltip] = useState(false)
 
-  // Check data freshness on mount and periodically
+  // Load data status on mount
   useEffect(() => {
-    const checkFreshness = async () => {
-      const info = await checkDataFreshness()
-      setFreshness(info)
+    const loadStatus = async () => {
+      try {
+        const metadataRes = await fetch('/data/metadata.json')
+        const metadata = await metadataRes.json()
+        
+        setLastUpdated(metadata.lastUpdated)
+        
+        // Get all series with dates
+        const allSeries = Object.entries(metadata.seriesInfo as Record<string, SeriesInfo>).map(([key, info]) => ({
+          key,
+          latestDate: info.latestDate
+        }))
+        
+        // Group by recency
+        const sortedByDate = allSeries.sort((a, b) => 
+          new Date(b.latestDate).getTime() - new Date(a.latestDate).getTime()
+        )
+        
+        const newestDate = sortedByDate[0].latestDate
+        const groups: SeriesGroup[] = []
+        
+        // Current (0-1 days old)
+        const currentSeries = sortedByDate.filter(s => {
+          const daysOld = Math.ceil(
+            (new Date(newestDate).getTime() - new Date(s.latestDate).getTime()) / (1000 * 60 * 60 * 24)
+          )
+          return daysOld <= 1
+        })
+        
+        if (currentSeries.length > 0) {
+          groups.push({
+            name: 'Current',
+            series: currentSeries,
+            latestDate: currentSeries[0].latestDate,
+            color: 'text-green-600',
+            emoji: '✨'
+          })
+        }
+        
+        // Recent (2-3 days old)
+        const recentSeries = sortedByDate.filter(s => {
+          const daysOld = Math.ceil(
+            (new Date(newestDate).getTime() - new Date(s.latestDate).getTime()) / (1000 * 60 * 60 * 24)
+          )
+          return daysOld >= 2 && daysOld <= 3
+        })
+        
+        if (recentSeries.length > 0) {
+          groups.push({
+            name: 'Recent',
+            series: recentSeries,
+            latestDate: recentSeries[0].latestDate,
+            color: 'text-blue-600',
+            emoji: '📅'
+          })
+        }
+        
+        // Updating Soon (4-7 days old)
+        const updatingSoonSeries = sortedByDate.filter(s => {
+          const daysOld = Math.ceil(
+            (new Date(newestDate).getTime() - new Date(s.latestDate).getTime()) / (1000 * 60 * 60 * 24)
+          )
+          return daysOld >= 4 && daysOld <= 7
+        })
+        
+        if (updatingSoonSeries.length > 0) {
+          groups.push({
+            name: 'Updating Soon',
+            series: updatingSoonSeries,
+            latestDate: updatingSoonSeries[0].latestDate,
+            color: 'text-amber-600',
+            emoji: '🔄'
+          })
+        }
+        
+        // Refreshing (8+ days old)
+        const refreshingSeries = sortedByDate.filter(s => {
+          const daysOld = Math.ceil(
+            (new Date(newestDate).getTime() - new Date(s.latestDate).getTime()) / (1000 * 60 * 60 * 24)
+          )
+          return daysOld >= 8
+        })
+        
+        if (refreshingSeries.length > 0) {
+          groups.push({
+            name: 'Refreshing',
+            series: refreshingSeries,
+            latestDate: refreshingSeries[0].latestDate,
+            color: 'text-purple-600',
+            emoji: '♻️'
+          })
+        }
+        
+        setSeriesGroups(groups)
+      } catch (error) {
+        console.error('Failed to load metadata:', error)
+      }
     }
 
-    checkFreshness()
-    
-    // Check every 5 minutes
-    const interval = setInterval(checkFreshness, 5 * 60 * 1000)
-    
-    return () => clearInterval(interval)
+    loadStatus()
   }, [])
 
-  const handleUpdateData = async () => {
-    if (isUpdating) return
-    
-    setIsUpdating(true)
-    
-    try {
-      const result = await triggerDataUpdate()
-      
-      if (result.success) {
-        // Refresh freshness info
-        const info = await checkDataFreshness()
-        setFreshness(info)
-      }
-    } catch (error) {
-      console.error('Update failed:', error)
-    } finally {
-      setIsUpdating(false)
-    }
-  }
-
-  if (!freshness) {
+  if (!lastUpdated || seriesGroups.length === 0) {
     return (
       <div className="flex items-center gap-2">
         <div className="w-3 h-3 bg-gray-400 rounded-full animate-pulse"></div>
         <div className="text-left">
-          <div className="text-xs font-medium text-gray-600">Checking...</div>
+          <div className="text-xs font-medium text-gray-600">Loading...</div>
         </div>
       </div>
     )
   }
 
-  const status = getUpdateStatus(freshness.isStale, freshness.needsUpdate)
-  const age = formatDataAge(freshness.lastUpdated)
-  const statusColor = freshness.isStale ? 'bg-red-500' : freshness.needsUpdate ? 'bg-yellow-500' : 'bg-green-500'
-  const textColor = freshness.isStale ? 'text-red-700' : freshness.needsUpdate ? 'text-yellow-700' : 'text-green-700'
+  const age = formatDataAge(lastUpdated)
+  const totalSeries = seriesGroups.reduce((sum, g) => sum + g.series.length, 0)
 
   return (
     <div 
@@ -71,58 +146,83 @@ export default function CompactDataStatus() {
       onMouseEnter={() => setShowTooltip(true)}
       onMouseLeave={() => setShowTooltip(false)}
     >
-      {/* Status Indicator */}
+      {/* Status Indicator - Always Green */}
       <div className="relative">
-        <div className={`w-3 h-3 ${statusColor} rounded-full`}></div>
-        {!freshness.isStale && !freshness.needsUpdate && (
-          <div className={`absolute inset-0 w-3 h-3 ${statusColor} rounded-full animate-ping opacity-75`}></div>
-        )}
+        <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+        <div className="absolute inset-0 w-3 h-3 bg-green-500 rounded-full animate-ping opacity-75"></div>
       </div>
       
       {/* Status Text */}
       <div className="text-left">
-        <div className={`text-xs font-medium ${textColor}`}>
-          {freshness.isStale ? 'Data Stale' : freshness.needsUpdate ? 'Update Available' : 'Data Current'}
+        <div className="text-xs font-medium text-green-600">
+          Data Active
         </div>
-        <div className="text-xs text-gray-500">Updated {age}</div>
+        <div className="text-xs text-gray-500">
+          {totalSeries} series • Updated {age}
+        </div>
       </div>
 
-      {/* Tooltip with Update Button */}
+      {/* Tooltip with Series Status */}
       {showTooltip && (
-        <div className="absolute top-full right-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg p-4 z-50">
-          <div className="space-y-3">
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-lg">{status.icon}</span>
-                <span className={`text-sm font-medium ${status.color}`}>{status.message}</span>
+        <div className="absolute top-full right-0 mt-2 w-96 bg-white border border-gray-200 rounded-xl shadow-xl p-4 z-50">
+          <div className="space-y-4">
+            {/* Header */}
+            <div className="border-b pb-3">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-lg">📊</span>
+                <span className="text-sm font-semibold text-gray-900">Data Series Status</span>
               </div>
               <div className="text-xs text-gray-600">
-                Last updated: {age}
+                Last system update: {age}
               </div>
             </div>
             
-            <button
-              onClick={handleUpdateData}
-              disabled={isUpdating || (!freshness.needsUpdate && !freshness.isStale)}
-              className={`
-                w-full px-3 py-2 text-sm font-medium rounded-md transition-colors
-                ${isUpdating 
-                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
-                  : freshness.needsUpdate || freshness.isStale
-                    ? 'bg-blue-600 text-white hover:bg-blue-700'
-                    : 'bg-gray-100 text-gray-500 cursor-not-allowed'
-                }
-              `}
-            >
-              {isUpdating ? (
-                <div className="flex items-center justify-center space-x-2">
-                  <div className="w-3 h-3 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
-                  <span>Updating...</span>
+            {/* Series Groups */}
+            <div className="space-y-3 max-h-80 overflow-y-auto">
+              {seriesGroups.map((group, idx) => (
+                <div key={idx} className="bg-gray-50 rounded-lg p-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-base">{group.emoji}</span>
+                    <span className={`text-xs font-semibold ${group.color}`}>
+                      {group.name}
+                    </span>
+                    <span className="text-xs text-gray-500">
+                      ({group.series.length} series)
+                    </span>
+                  </div>
+                  
+                  <div className="text-xs text-gray-600 mb-2">
+                    Latest: {new Date(group.latestDate).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric'
+                    })}
+                  </div>
+                  
+                  <div className="flex flex-wrap gap-1">
+                    {group.series.map((series, seriesIdx) => (
+                      <span
+                        key={seriesIdx}
+                        className="text-[10px] px-2 py-0.5 bg-white border border-gray-200 rounded text-gray-700"
+                      >
+                        {series.key}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-              ) : (
-                'Update Data'
-              )}
-            </button>
+              ))}
+            </div>
+            
+            {/* Footer Info */}
+            <div className="border-t pt-3 text-xs text-gray-500">
+              <div className="flex items-start gap-2">
+                <span>💡</span>
+                <div>
+                  <p className="font-medium text-gray-700 mb-1">About data timing:</p>
+                  <p>Series update on different schedules based on their source (daily markets, weekly reports, monthly releases). This is normal.</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}
