@@ -86,6 +86,7 @@ export default async function QuantViewDashboard() {
   // Calculate aggregate metrics
   const totalDataPoints = series.reduce((sum, s) => sum + s.data.length, 0)
   const activeSeries = series.filter(s => s.data.length > 0).length
+  const uniqueDates = new Set(allDates).size  // Get unique dates count
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
@@ -131,7 +132,7 @@ export default async function QuantViewDashboard() {
             <div className="flex items-center">
               <div className="flex-1">
                 <p className="text-sm font-medium text-gray-600">Data Coverage</p>
-                <p className="text-2xl font-bold text-gray-900">{allDates.length}</p>
+                <p className="text-2xl font-bold text-gray-900">{uniqueDates}</p>
                 <p className="text-sm text-gray-500 mt-1">unique dates</p>
               </div>
               <div className="ml-3">
