@@ -8,9 +8,36 @@ A professional, interactive financial analytics dashboard built with Next.js, fe
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind-4.0-cyan)
 ![Recharts](https://img.shields.io/badge/Recharts-3.2.1-orange)
 
+---
+
+## 📚 Documentation Categories
+
+### Navigation & Organization
+- [INDEX.md](docs/INDEX.md) - Master index with search
+- [QUICK_REF.md](docs/QUICK_REF.md) - Quick reference guide
+- [MAP.md](docs/MAP.md) - Visual documentation map
+- [docs/README.md](docs/README.md) - Documentation hub
+
+### Fixes & Improvements
+- [13_SERIES_FIX.md](docs/13_SERIES_FIX.md) - Display text correction
+- [404_FIX.md](docs/404_FIX.md) - Symlink solution
+- [SETUP_SCRIPT.md](docs/SETUP_SCRIPT.md) - Automated setup
+- [UX_IMPROVEMENTS.md](docs/UX_IMPROVEMENTS.md) - Positive status design
+
+### Data Synchronization
+- [SYNC_STRATEGY.md](docs/SYNC_STRATEGY.md) - Why series update differently
+- [SYNC_MONITORING.md](docs/SYNC_MONITORING.md) - CLI monitoring tool
+- [DRIFT_EXPLANATION.md](docs/DRIFT_EXPLANATION.md) - Understanding data drift
+
+### Features
+- [MULTI_YEAR_X_AXIS_IMPROVEMENTS.md](docs/MULTI_YEAR_X_AXIS_IMPROVEMENTS.md) - X-axis enhancements
+- [NEW_SERIES_SP500_EURUSD.md](docs/NEW_SERIES_SP500_EURUSD.md) - New series addition
+
+---
+
 ## 🎯 Features
 
-- **Comprehensive Economic Data**: 13 data series including Treasury yields, inflation (CPI), market volatility (VIX, GVZ), employment, commodities (Oil), and currency (Dollar Index)
+- **Comprehensive Economic Data**: 15 data series including Treasury yields, inflation (CPI), market volatility (VIX, GVZ), employment, commodities (Oil), currency (EUR/USD, Dollar Index), and equity markets (S&P 500)
 - **Interactive Multi-Series Charts**: Professional Recharts visualizations with advanced filtering
 - **Smart Metric Selection**: Mutual exclusion between percentage and absolute value metrics
 - **Advanced Time Filtering**: Year and month selection for precise time range analysis
@@ -22,20 +49,22 @@ A professional, interactive financial analytics dashboard built with Next.js, fe
 
 ## 📊 Dashboard Capabilities
 
-### Data Series (13 Total)
-- **Treasury Yields** (5): 1Y, 2Y, 5Y, 10Y, 20Y, 30Y bond yields from Federal Reserve
+### Data Series (15 Total)
+- **Treasury Yields** (5): 1Y, 2Y, 5Y, 10Y, 20Y bond yields from Federal Reserve
 - **Inflation Metrics** (2): CPI All Items & Core CPI with interpolation
 - **Market Volatility** (2): VIX (stocks) & GVZ (gold) indices
 - **Employment** (1): Unemployment Rate
 - **Commodities** (1): WTI Crude Oil Price ($/barrel)
-- **Currency** (1): US Dollar Index
+- **Markets & FX** (3): S&P 500 Index, EUR/USD Exchange Rate, US Dollar Index
 - **Economic Indicators** (1): Yield Curve Spread (10Y-2Y)
 
 ### Interactive Features
 - **Smart Metric Selection**: Automatic mutual exclusion between percentage and absolute metrics
 - **Category Tiles**: Hover popups with individual series selection
-- **Time Filtering**: Year and month selection with multi-select support
-- **Theme Toggle**: Light/dark mode with localStorage persistence
+- **Advanced Time Filtering**: 
+  - **Multi-Year Selection**: Select multiple years to compare trends across years
+  - **Month-Level Filtering**: When single year is selected, filter by specific months
+  - **Smart Mode Switching**: Month selection automatically disabled in multi-year mode
 - **Data Status**: Real-time freshness indicator with update button
 - **Current Values**: Live display of latest values for selected metrics
 - **Responsive Design**: Optimized for desktop, tablet, and mobile
@@ -43,9 +72,14 @@ A professional, interactive financial analytics dashboard built with Next.js, fe
 
 ## ✨ Recent Improvements
 
+### v2.1 - Advanced Time Filtering
+- 📆 **Multi-Year Selection**: Select multiple years simultaneously to compare trends across time periods
+- 🔄 **Smart Mode Switching**: Automatic transition between single-year (with months) and multi-year modes
+- 📊 **Enhanced Visualization**: Seamless data display for both single and multi-year selections
+- ⚡ **Optimized Performance**: Efficient data filtering for large time ranges
+
 ### v2.0 - Modern Financial Dashboard
-- 🌙 **Dark Mode**: Beautiful light/dark theme toggle with localStorage persistence
-- 📊 **Expanded Data**: 13 economic indicators (up from 6) including VIX, GVZ, Oil, Dollar Index
+- 📊 **Expanded Data**: 13 economic indicators including VIX, GVZ, Oil, Dollar Index
 - 🎯 **Smart Selection**: Mutual exclusion between percentage and absolute metrics
 - 📅 **Month Selection**: Granular time filtering with multi-select month grid
 - 🎨 **Horizontal Layout**: Space-efficient single-row category tiles
@@ -73,7 +107,12 @@ pnpm install
 # Set up environment variables
 echo "FRED_API_KEY=your_fred_api_key_here" > .env.local
 echo "FRED_API_BASE_URL=https://api.stlouisfed.org/fred" >> .env.local
+
+# Run setup script (creates necessary symlinks)
+pnpm run setup
 ```
+
+**Note:** The setup script creates a symlink from `public/data` to `data/` so JSON files are accessible via HTTP. This is required for the data freshness indicator to work.
 
 ### Initial Data Setup (Required - One Time Only)
 
@@ -422,19 +461,22 @@ jobs:
 ### Chart Visualization
 - **Daily Data Visualization**: High-resolution daily data with smooth interpolation
 - **Multi-Series Support**: Compare up to 13 different economic indicators
+- **Flexible Time Ranges**: 
+  - **Single-Year + Months**: View specific months within a year for detailed analysis
+  - **Multi-Year**: Select multiple years for long-term trend comparison
 - **Custom Tooltips**: Context-aware formatting (%, $, Index values)
 - **Responsive Legend**: Color-coded series with current values
 - **Y-Axis Formatting**: Automatic unit detection and formatting
 
 ### Interactive Controls
 - **Category Tiles**: Organized into 7 categories with hover popups
-  - Treasury Yields (6 series)
+  - Treasury Yields (5 series)
   - Inflation Metrics (2 series)
   - Market Volatility (2 series)
   - Labor Market (1 series)
   - Economic Indicators (1 series)
   - Commodities (1 series)
-  - Currency & FX (1 series)
+  - Markets & FX (3 series: S&P 500, EUR/USD, Dollar Index)
 - **Smart Selection**: Mutual exclusion between percentage and absolute metrics
 - **Year Filtering**: Select specific years (2018-2025) with chips
 - **Month Selection**: Multi-select month grid with range support
@@ -518,8 +560,14 @@ A: Click the sun/moon icon in the top-right header. Your preference is saved to 
 **Q: Why can't I select percentage and absolute metrics together?**
 A: Different Y-axis scales (% vs $ vs Index) make comparison difficult. The UI enforces mutual exclusion for clearer visualization.
 
+**Q: How do I select multiple years?**
+A: Click on any year chip to add it to your selection. You can select multiple years to compare trends across time. Note that month selection is automatically disabled when multiple years are selected.
+
 **Q: How do I select multiple months?**
-A: Click individual months in the grid. The UI automatically creates ranges for consecutive selections (up to 6 months).
+A: Month selection is available only when a single year is selected. Click individual months in the grid, and the UI automatically creates ranges for consecutive selections (up to 6 months).
+
+**Q: Why can't I select months when multiple years are selected?**
+A: When viewing multiple years, month-level filtering is disabled to provide a clearer year-over-year comparison. Select a single year to enable month filtering for granular analysis.
 
 **Q: What's the yield curve spread?**
 A: The difference between 10-Year and 2-Year Treasury yields. A negative spread often signals recession risk.
