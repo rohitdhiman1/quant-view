@@ -30,6 +30,9 @@ This folder contains all detailed technical documentation, troubleshooting guide
 - **[SETUP_SCRIPT.md](SETUP_SCRIPT.md)** - Automated setup
 - **[UX_IMPROVEMENTS.md](UX_IMPROVEMENTS.md)** - Positive status design
 
+#### Deployment (1 doc)
+- **[CLOUDFLARE_DEPLOYMENT.md](CLOUDFLARE_DEPLOYMENT.md)** - Complete Cloudflare Pages guide
+
 #### Data Synchronization (3 docs)
 - **[SYNC_STRATEGY.md](SYNC_STRATEGY.md)** - Why series differ
 - **[SYNC_MONITORING.md](SYNC_MONITORING.md)** - CLI tool guide
