@@ -28,7 +28,7 @@ export interface SeriesConfig {
   category: 'yields' | 'inflation' | 'volatility' | 'employment' | 'commodities' | 'currency' | 'economic_indicators'
   frequency: 'daily' | 'monthly'
   requiresInterpolation?: boolean
-  unit?: string // Unit for display (e.g., '$/barrel', 'Index', '%', 'USD')
+  unit?: string // Unit for display (e.g., '$/barrel', 'Index', '%', 'points', 'USD')
 }
 
 export interface TreasuryYieldConfig extends SeriesConfig {
