@@ -43,7 +43,7 @@ export interface SeriesConfig {
   visible: boolean;
   /** Category of the data */
   category: 'yields' | 'inflation' | 'volatility' | 'employment' | 'commodities' | 'currency' | 'economic_indicators';
-  /** Unit for display (%, bps, $, etc.) */
+  /** Unit for display (%, points, $, Index, etc.) */
   unit: string;
 }
 
@@ -129,7 +129,7 @@ export const SERIES_CONFIGS: Omit<SeriesConfig, 'data'>[] = [
     color: '#1f2937', // dark gray/charcoal
     visible: false,
     category: 'volatility',
-    unit: '%'
+    unit: 'points'
   },
   {
     key: 'gvz',
@@ -137,7 +137,7 @@ export const SERIES_CONFIGS: Omit<SeriesConfig, 'data'>[] = [
     color: '#b45309', // brown/bronze (for gold)
     visible: false,
     category: 'volatility',
-    unit: '%'
+    unit: 'points'
   },
   // Economic Indicators
   {

@@ -56,6 +56,8 @@ const CustomTooltip = ({ active, payload, label, seriesConfigs = [] }: CustomToo
             formattedValue = `$${entry.value.toFixed(4)}`
           } else if (unit === 'Index') {
             formattedValue = entry.value.toFixed(2)
+          } else if (unit === 'points') {
+            formattedValue = entry.value.toFixed(2)
           } else if (unit === '%') {
             formattedValue = `${entry.value.toFixed(2)}%`
           } else {
@@ -97,7 +99,7 @@ export default function MultiSeriesChartComponent({
   
   // Helper function to determine if a metric uses absolute values
   const isAbsoluteMetric = (unit: string) => {
-    return unit === '$/barrel' || unit === 'Index' || unit === 'USD'
+    return unit === '$/barrel' || unit === 'Index' || unit === 'USD' || unit === 'points'
   }
   
   // Helper function to determine if a metric uses percentage values
@@ -308,14 +310,14 @@ export default function MultiSeriesChartComponent({
         {/* Unified Horizontal Grid with Divider */}
         <div className="flex items-start gap-4">
           {/* Percentage Metrics */}
-          <div className="flex-1">
+          <div className="flex-shrink-0">
             <div className="flex items-center gap-2 mb-2">
               <div className="flex items-center gap-1.5 px-2 py-0.5 bg-blue-100 text-blue-700 rounded-md text-[10px] font-bold">
                 <span>%</span>
                 <span>PERCENTAGE</span>
               </div>
             </div>
-            <div className="grid grid-cols-5 gap-2">
+            <div className="grid gap-2" style={{ gridTemplateColumns: 'repeat(4, 170px)' }}>
               {Object.entries(seriesByCategory)
                 .filter(([_, seriesGroup]) => 
                   seriesGroup.some(s => isPercentageMetric(s.unit))
@@ -416,24 +418,26 @@ export default function MultiSeriesChartComponent({
           </div>
 
           {/* Absolute Metrics */}
-          <div className="flex-shrink-0" style={{ width: '280px' }}>
+          <div className="flex-shrink-0">
             <div className="flex items-center gap-2 mb-2">
               <div className="flex items-center gap-1.5 px-2 py-0.5 bg-green-100 text-green-700 rounded-md text-[10px] font-bold">
                 <span>#</span>
                 <span>ABSOLUTE</span>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid gap-2" style={{ gridTemplateColumns: 'repeat(3, 160px)' }}>
               {Object.entries(seriesByCategory)
                 .filter(([_, seriesGroup]) => 
                   seriesGroup.some(s => isAbsoluteMetric(s.unit))
                 )
                 .map(([category, seriesGroup]) => {
                   const categoryName = category === 'commodities' ? 'Commodities' :
-                                      category === 'currency' ? 'Markets & FX' : 'Other'
+                                      category === 'currency' ? 'Markets & FX' : 
+                                      category === 'volatility' ? 'Volatility' : 'Other'
                   
                   const categoryIcon = category === 'commodities' ? '🛢️' :
-                                      category === 'currency' ? '📊' : '📋'
+                                      category === 'currency' ? '📊' : 
+                                      category === 'volatility' ? '⚡' : '📋'
                   
                   const selectedCount = seriesGroup.filter(s => visibleSeries.has(s.key)).length
                   const hasSelected = selectedCount > 0
@@ -534,6 +538,8 @@ export default function MultiSeriesChartComponent({
               } else if (unit === 'USD') {
                 formattedValue = `$${item.value.toFixed(4)}`
               } else if (unit === 'Index') {
+                formattedValue = item.value.toFixed(2)
+              } else if (unit === 'points') {
                 formattedValue = item.value.toFixed(2)
               } else if (unit === '%') {
                 formattedValue = `${item.value.toFixed(2)}%`
