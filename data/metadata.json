@@ -1,0 +1,80 @@
+{
+  "lastUpdated": "2025-10-25",
+  "seriesInfo": {
+    "treasury_1y": {
+      "latestDate": "2025-10-23",
+      "recordCount": 1953,
+      "fredSeriesId": "DGS1"
+    },
+    "treasury_2y": {
+      "latestDate": "2025-10-23",
+      "recordCount": 1953,
+      "fredSeriesId": "DGS2"
+    },
+    "treasury_5y": {
+      "latestDate": "2025-10-23",
+      "recordCount": 1953,
+      "fredSeriesId": "DGS5"
+    },
+    "treasury_10y": {
+      "latestDate": "2025-10-23",
+      "recordCount": 1953,
+      "fredSeriesId": "DGS10"
+    },
+    "treasury_20y": {
+      "latestDate": "2025-10-23",
+      "recordCount": 1953,
+      "fredSeriesId": "DGS20"
+    },
+    "cpi": {
+      "latestDate": "2025-10-16",
+      "recordCount": 1948,
+      "fredSeriesId": "CPIAUCSL"
+    },
+    "core_cpi": {
+      "latestDate": "2025-10-16",
+      "recordCount": 1948,
+      "fredSeriesId": "CPILFESL"
+    },
+    "vix": {
+      "latestDate": "2025-10-23",
+      "recordCount": 1990,
+      "fredSeriesId": "VIXCLS"
+    },
+    "gvz": {
+      "latestDate": "2025-10-23",
+      "recordCount": 1966,
+      "fredSeriesId": "GVZCLS"
+    },
+    "unemployment_rate": {
+      "latestDate": "2025-10-16",
+      "recordCount": 1948,
+      "fredSeriesId": "UNRATE"
+    },
+    "oil_price": {
+      "latestDate": "2025-10-20",
+      "recordCount": 1951,
+      "fredSeriesId": "DCOILWTICO"
+    },
+    "dollar_index": {
+      "latestDate": "2025-10-17",
+      "recordCount": 1945,
+      "fredSeriesId": "DTWEXBGS"
+    },
+    "eur_usd": {
+      "latestDate": "2025-10-17",
+      "recordCount": 1947,
+      "fredSeriesId": "DEXUSEU"
+    },
+    "sp500": {
+      "latestDate": "2025-10-24",
+      "recordCount": 1965,
+      "fredSeriesId": "SP500"
+    },
+    "yield_curve_spread": {
+      "latestDate": "2025-10-23",
+      "recordCount": 1953,
+      "fredSeriesId": "T10Y2Y (calculated)"
+    }
+  }
+}

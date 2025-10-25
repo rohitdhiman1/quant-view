@@ -1,0 +1,25 @@
+{
+  "lastUpdated": "2025-10-16",
+  "seriesInfo": {
+    "treasury_1y": {
+      "latestDate": "2025-10-15",
+      "recordCount": 1947,
+      "fredSeriesId": "DGS1"
+    },
+    "treasury_5y": {
+      "latestDate": "2025-10-15",
+      "recordCount": 1947,
+      "fredSeriesId": "DGS5"
+    },
+    "treasury_10y": {
+      "latestDate": "2025-10-15",
+      "recordCount": 1947,
+      "fredSeriesId": "DGS10"
+    },
+    "treasury_20y": {
+      "latestDate": "2025-10-15",
+      "recordCount": 1947,
+      "fredSeriesId": "DGS20"
+    }
+  }
+}

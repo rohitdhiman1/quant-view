@@ -1,0 +1,45 @@
+{
+  "lastUpdated": "2025-10-17",
+  "seriesInfo": {
+    "treasury_1y": {
+      "latestDate": "2025-10-15",
+      "recordCount": 1947,
+      "fredSeriesId": "DGS1"
+    },
+    "treasury_5y": {
+      "latestDate": "2025-10-15",
+      "recordCount": 1947,
+      "fredSeriesId": "DGS5"
+    },
+    "treasury_10y": {
+      "latestDate": "2025-10-15",
+      "recordCount": 1947,
+      "fredSeriesId": "DGS10"
+    },
+    "treasury_20y": {
+      "latestDate": "2025-10-15",
+      "recordCount": 1947,
+      "fredSeriesId": "DGS20"
+    },
+    "cpi": {
+      "latestDate": "2025-10-15",
+      "recordCount": 1947,
+      "fredSeriesId": "CPIAUCSL"
+    },
+    "core_cpi": {
+      "latestDate": "2025-10-15",
+      "recordCount": 1947,
+      "fredSeriesId": "CPILFESL"
+    },
+    "vix": {
+      "latestDate": "2025-10-15",
+      "recordCount": 1984,
+      "fredSeriesId": "VIXCLS"
+    },
+    "gvz": {
+      "latestDate": "2025-10-15",
+      "recordCount": 1960,
+      "fredSeriesId": "GVZCLS"
+    }
+  }
+}
