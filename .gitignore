@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 # next-env.d.ts - commented out as this should be committed for Next.js TypeScript projects
+
+# data symlink (actual data is in /data folder)
+/public/data
