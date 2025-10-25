@@ -211,33 +211,6 @@ async function fetchInitialData() {
   console.log(`📋 Metadata saved to: ${path.join(FRED_CONFIG.dataDir, 'metadata.json')}`)
 }
 
-/**
- * Backup existing data before overwriting
- */
-async function backupExistingData() {
-  const backupDir = path.join(FRED_CONFIG.dataDir, 'backup')
-  const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
-  const backupPath = path.join(backupDir, timestamp)
-
-  try {
-    await fs.mkdir(backupPath, { recursive: true })
-    
-    // Copy existing JSON files
-    const files = await fs.readdir(FRED_CONFIG.dataDir)
-    const jsonFiles = files.filter(file => file.endsWith('.json'))
-    
-    for (const file of jsonFiles) {
-      const srcPath = path.join(FRED_CONFIG.dataDir, file)
-      const destPath = path.join(backupPath, file)
-      await fs.copyFile(srcPath, destPath)
-    }
-    
-    console.log(`📦 Existing data backed up to: ${backupPath}`)
-  } catch (error) {
-    console.log('📝 No existing data to backup or backup failed:', error instanceof Error ? error.message : 'Unknown error')
-  }
-}
-
 // Main execution
 async function main() {
   try {
@@ -249,7 +222,6 @@ async function main() {
       process.exit(1)
     }
 
-    await backupExistingData()
     await fetchInitialData()
     
   } catch (error) {
