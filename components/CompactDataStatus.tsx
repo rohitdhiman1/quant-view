@@ -21,12 +21,16 @@ export default function CompactDataStatus() {
   const [lastUpdated, setLastUpdated] = useState<string | null>(null)
   const [seriesGroups, setSeriesGroups] = useState<SeriesGroup[]>([])
   const [showTooltip, setShowTooltip] = useState(false)
+  const [error, setError] = useState<boolean>(false)
 
   // Load data status on mount
   useEffect(() => {
     const loadStatus = async () => {
       try {
         const metadataRes = await fetch('/data/metadata.json')
+        if (!metadataRes.ok) {
+          throw new Error(`HTTP ${metadataRes.status}`)
+        }
         const metadata = await metadataRes.json()
         
         setLastUpdated(metadata.lastUpdated)
@@ -120,11 +124,25 @@ export default function CompactDataStatus() {
         setSeriesGroups(groups)
       } catch (error) {
         console.error('Failed to load metadata:', error)
+        setError(true)
       }
     }
 
     loadStatus()
   }, [])
+
+  // Error state
+  if (error) {
+    return (
+      <div className="flex items-center gap-2">
+        <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
+        <div className="text-left">
+          <div className="text-xs font-medium text-gray-600">Data Status</div>
+          <div className="text-xs text-gray-500">Metadata unavailable</div>
+        </div>
+      </div>
+    )
+  }
 
   if (!lastUpdated || seriesGroups.length === 0) {
     return (
