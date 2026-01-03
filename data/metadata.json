@@ -1,29 +1,29 @@
 {
-  "lastUpdated": "2025-10-25",
+  "lastUpdated": "2025-11-30",
   "seriesInfo": {
     "treasury_1y": {
-      "latestDate": "2025-10-23",
-      "recordCount": 1953,
+      "latestDate": "2025-11-26",
+      "recordCount": 1976,
       "fredSeriesId": "DGS1"
     },
     "treasury_2y": {
-      "latestDate": "2025-10-23",
-      "recordCount": 1953,
+      "latestDate": "2025-11-26",
+      "recordCount": 1976,
       "fredSeriesId": "DGS2"
     },
     "treasury_5y": {
-      "latestDate": "2025-10-23",
-      "recordCount": 1953,
+      "latestDate": "2025-11-26",
+      "recordCount": 1976,
       "fredSeriesId": "DGS5"
     },
     "treasury_10y": {
-      "latestDate": "2025-10-23",
-      "recordCount": 1953,
+      "latestDate": "2025-11-26",
+      "recordCount": 1976,
       "fredSeriesId": "DGS10"
     },
     "treasury_20y": {
-      "latestDate": "2025-10-23",
-      "recordCount": 1953,
+      "latestDate": "2025-11-26",
+      "recordCount": 1976,
       "fredSeriesId": "DGS20"
     },
     "cpi": {
@@ -37,13 +37,13 @@
       "fredSeriesId": "CPILFESL"
     },
     "vix": {
-      "latestDate": "2025-10-23",
-      "recordCount": 1990,
+      "latestDate": "2025-11-27",
+      "recordCount": 2015,
       "fredSeriesId": "VIXCLS"
     },
     "gvz": {
-      "latestDate": "2025-10-23",
-      "recordCount": 1966,
+      "latestDate": "2025-11-26",
+      "recordCount": 1990,
       "fredSeriesId": "GVZCLS"
     },
     "unemployment_rate": {
@@ -52,28 +52,28 @@
       "fredSeriesId": "UNRATE"
     },
     "oil_price": {
-      "latestDate": "2025-10-20",
-      "recordCount": 1951,
+      "latestDate": "2025-11-24",
+      "recordCount": 1975,
       "fredSeriesId": "DCOILWTICO"
     },
     "dollar_index": {
-      "latestDate": "2025-10-17",
-      "recordCount": 1945,
+      "latestDate": "2025-11-21",
+      "recordCount": 1969,
       "fredSeriesId": "DTWEXBGS"
     },
     "eur_usd": {
-      "latestDate": "2025-10-17",
-      "recordCount": 1947,
+      "latestDate": "2025-11-21",
+      "recordCount": 1971,
       "fredSeriesId": "DEXUSEU"
     },
     "sp500": {
-      "latestDate": "2025-10-24",
-      "recordCount": 1965,
+      "latestDate": "2025-11-28",
+      "recordCount": 1989,
       "fredSeriesId": "SP500"
     },
     "yield_curve_spread": {
-      "latestDate": "2025-10-23",
-      "recordCount": 1953,
+      "latestDate": "2025-11-26",
+      "recordCount": 1976,
       "fredSeriesId": "T10Y2Y (calculated)"
     }
   }
