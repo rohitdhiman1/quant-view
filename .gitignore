@@ -42,3 +42,6 @@ yarn-error.log*
 
 # data symlink (actual data is in /data folder)
 /public/data
+
+# Intermediate monthly data files (used for interpolation, not committed)
+/data/*_monthly.json
