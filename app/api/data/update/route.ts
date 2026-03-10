@@ -44,7 +44,7 @@ export async function POST(_request: NextRequest) {
     return NextResponse.json(
       { 
         success: false, 
-        error: 'API routes not available in static export. Use CLI commands: pnpm run fetch-data or pnpm run update-data' 
+        error: 'API routes not available in static export. Use CLI commands: npm run fetch-data or npm run update-data' 
       },
       { status: 501 }
     )
