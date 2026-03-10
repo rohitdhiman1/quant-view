@@ -26,7 +26,7 @@ fi
 # Verify data files exist
 if [ ! -f "data/metadata.json" ]; then
   echo "⚠️  Warning: data/metadata.json not found"
-  echo "   Run 'pnpm run fetch-data' to initialize data"
+  echo "   Run 'npm run fetch-data' to initialize data"
 else
   echo "✅ Data files found"
 fi
@@ -34,7 +34,7 @@ fi
 # Check if node_modules exists
 if [ ! -d "node_modules" ]; then
   echo "📦 Installing dependencies..."
-  pnpm install
+  npm install
 else
   echo "✅ Dependencies installed"
 fi
@@ -44,7 +44,7 @@ echo "🎉 Setup complete!"
 echo ""
 echo "Next steps:"
 echo "  1. Ensure .env.local has FRED_API_KEY set"
-echo "  2. Run 'pnpm run fetch-data' to initialize data (if needed)"
-echo "  3. Run 'pnpm run dev' to start development server"
-echo "  4. Run 'pnpm run check-sync' to verify data synchronization"
+echo "  2. Run 'npm run fetch-data' to initialize data (if needed)"
+echo "  3. Run 'npm run dev' to start development server"
+echo "  4. Run 'npm run check-sync' to verify data synchronization"
 echo ""
