@@ -261,7 +261,8 @@ export default async function QuantViewDashboard() {
       <footer className="bg-white border-t border-gray-200">
         <div className="mx-auto px-6 sm:px-8 lg:px-12 py-4">
           <div className="text-center text-sm text-gray-600">
-            © {new Date().getFullYear()} Rohit Dhiman. All rights reserved.
+            <div>Data sourced from <a href="https://fred.stlouisfed.org/" className="underline hover:text-gray-900" target="_blank" rel="noopener noreferrer">Federal Reserve Economic Data (FRED)</a>, Federal Reserve Bank of St. Louis.</div>
+            <div className="mt-1">© {new Date().getFullYear()} Rohit Dhiman · <a href="https://github.com/rohitdhiman1/quant-view" className="underline hover:text-gray-900" target="_blank" rel="noopener noreferrer">GitHub</a></div>
           </div>
         </div>
       </footer>
