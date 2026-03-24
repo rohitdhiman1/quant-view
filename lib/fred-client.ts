@@ -68,14 +68,36 @@ export class FredApiClient {
   }
 
   /**
-   * Get the latest available date from FRED for a series
+   * Get the latest available date from FRED for a series.
+   * Uses sort_order=desc&limit=1 to fetch only the most recent observation,
+   * avoiding a full data download just to check freshness.
    */
   async getLatestDate(seriesId: string): Promise<string | null> {
+    if (!FRED_CONFIG.apiKey) {
+      return null
+    }
+
+    await this.rateLimitedRequest()
+
+    const params = new URLSearchParams({
+      series_id: seriesId,
+      api_key: FRED_CONFIG.apiKey,
+      file_type: 'json',
+      sort_order: 'desc',
+      limit: '1'
+    })
+
+    const url = `${FRED_CONFIG.baseUrl}/series/observations?${params}`
+
     try {
-      const data = await this.fetchSeries(seriesId, '2020-01-01')
-      if (data.length === 0) return null
-      
-      return data[data.length - 1].date
+      const response = await fetch(url)
+      if (!response.ok) return null
+
+      const data: FredApiResponse = await response.json()
+      const valid = data.observations.filter(
+        p => p.value !== '.' && p.value !== null
+      )
+      return valid.length > 0 ? valid[0].date : null
     } catch (error) {
       console.error(`Error getting latest date for ${seriesId}:`, error)
       return null
