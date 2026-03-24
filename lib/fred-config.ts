@@ -183,19 +183,31 @@ export const CURRENCY_SERIES: TreasuryYieldConfig[] = [
   }
 ]
 
-// FRED Series IDs for Economic Indicators (Daily - calculated from existing data)
-export const ECONOMIC_INDICATOR_SERIES: TreasuryYieldConfig[] = [
+// FRED Series IDs for Fed Funds Rate (Daily)
+export const FED_RATE_SERIES: TreasuryYieldConfig[] = [
   {
-    key: 'yield_curve_spread',
-    name: '10Y-2Y Yield Spread',
-    fredSeriesId: 'T10Y2Y',
-    color: '#ea580c', // orange-600
+    key: 'fed_rate',
+    name: 'Fed Funds Rate',
+    fredSeriesId: 'DFF',
+    color: '#b91c1c', // red-700
     category: 'economic_indicators',
     frequency: 'daily'
   }
 ]
 
-// Combined series for easy iteration
+// Yield curve spread is calculated locally from 10Y - 2Y treasury data,
+// not fetched from FRED. Config kept here for reference only.
+export const YIELD_CURVE_SPREAD_CONFIG: SeriesConfig = {
+  key: 'yield_curve_spread',
+  name: '10Y-2Y Yield Spread',
+  fredSeriesId: 'T10Y2Y',
+  color: '#ea580c', // orange-600
+  category: 'economic_indicators',
+  frequency: 'daily'
+}
+
+// Combined series for easy iteration (fetched from FRED API)
+// yield_curve_spread is excluded — it's calculated locally from treasury data
 export const ALL_SERIES: SeriesConfig[] = [
   ...TREASURY_YIELD_SERIES,
   ...INFLATION_SERIES,
@@ -203,7 +215,7 @@ export const ALL_SERIES: SeriesConfig[] = [
   ...EMPLOYMENT_SERIES,
   ...COMMODITY_SERIES,
   ...CURRENCY_SERIES,
-  ...ECONOMIC_INDICATOR_SERIES
+  ...FED_RATE_SERIES,
 ]
 
 // API Configuration

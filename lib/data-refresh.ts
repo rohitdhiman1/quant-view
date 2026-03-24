@@ -63,7 +63,7 @@ export async function triggerDataUpdate(): Promise<UpdateResult> {
       seriesUpdated: [],
       newRecords: 0,
       timestamp: new Date().toISOString(),
-      error: 'Static export mode: Use CLI commands "pnpm run fetch-data" or "pnpm run update-data" to update data, then rebuild the site.'
+      error: 'Static export mode: Use CLI commands "npm run fetch-data" or "npm run update-data" to update data, then rebuild the site.'
     }
   } catch (error) {
     return {

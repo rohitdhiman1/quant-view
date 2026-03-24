@@ -41,11 +41,11 @@ fi
 echo ""
 echo "2️⃣  Checking if Build Has Been Run..."
 if [ -d "out" ] && [ -f "out/index.html" ]; then
-  check_result 0 "Build output exists (run 'pnpm run build' to regenerate)"
+  check_result 0 "Build output exists (run 'npm run build' to regenerate)"
 else
   echo -e "${YELLOW}⚠️  INFO${NC}: No build output found. Running build check..."
-  if pnpm run build > /tmp/build-test.log 2>&1; then
-    check_result 0 "Build succeeds (pnpm run build)"
+  if npm run build > /tmp/build-test.log 2>&1; then
+    check_result 0 "Build succeeds (npm run build)"
   else
     check_result 1 "Build failed - check /tmp/build-test.log for errors"
   fi
@@ -92,10 +92,10 @@ fi
 
 echo ""
 echo "6️⃣  Validating Package Manager..."
-if [ -f "pnpm-lock.yaml" ]; then
-  check_result 0 "pnpm-lock.yaml exists (Cloudflare will use pnpm)"
+if [ -f "package-lock.json" ]; then
+  check_result 0 "package-lock.json exists"
 else
-  check_result 1 "pnpm-lock.yaml missing (may fall back to npm)"
+  check_result 1 "package-lock.json missing (run npm install)"
 fi
 
 echo ""
@@ -139,7 +139,7 @@ if [ $CHECKS_FAILED -eq 0 ]; then
   echo "2. Go to: https://dash.cloudflare.com/"
   echo "3. Workers & Pages → Create → Pages → Connect to Git"
   echo "4. Select your repo and configure:"
-  echo "   - Build command: pnpm run build"
+  echo "   - Build command: npm run build"
   echo "   - Build output: out"
   echo "5. Deploy! 🚀"
   echo ""

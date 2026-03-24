@@ -107,7 +107,7 @@ fi
 # Run build
 echo ""
 echo -e "${BLUE}🔨 Building project...${NC}"
-if pnpm run build > /tmp/release-build.log 2>&1; then
+if npm run build > /tmp/release-build.log 2>&1; then
   echo -e "${GREEN}✅ Build succeeded${NC}"
 else
   echo -e "${RED}❌ Build failed${NC}"

@@ -522,9 +522,8 @@ export default function MultiSeriesChartComponent({
       {/* Current Values Display */}
       {currentValues.length > 0 && (
         <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-          <div className="flex items-center justify-between mb-3">
+          <div className="mb-3">
             <h3 className="text-sm font-semibold text-gray-700">Current Values</h3>
-            <p className="text-xs text-gray-500 italic">💡 Click any value to remove from chart</p>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             {currentValues.map(item => {
@@ -551,7 +550,7 @@ export default function MultiSeriesChartComponent({
                 <button
                   key={item.name}
                   onClick={() => seriesConfig && toggleSeries(seriesConfig.key)}
-                  className="group flex items-center space-x-2 p-2 rounded-lg hover:bg-white hover:shadow-md transition-all duration-200 cursor-pointer border-2 border-transparent hover:border-red-200 relative"
+                  className="group flex items-center space-x-2 p-2 rounded-lg hover:bg-white hover:shadow-md transition-all duration-200 cursor-pointer border border-gray-200 hover:border-red-300"
                   title={`Click to remove ${item.name} from chart`}
                 >
                   <div 
@@ -562,10 +561,10 @@ export default function MultiSeriesChartComponent({
                   <span className="text-sm font-semibold flex-shrink-0" style={{ color: item.color }}>
                     {formattedValue}
                   </span>
-                  {/* Remove icon that appears on hover */}
-                  <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-md">
-                    <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  {/* Remove icon - always visible */}
+                  <div className="w-4 h-4 bg-gray-300 group-hover:bg-red-500 rounded-full flex items-center justify-center flex-shrink-0 transition-colors duration-200">
+                    <svg className="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   </div>
                 </button>

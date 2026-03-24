@@ -65,10 +65,8 @@ async function fetchInitialData() {
   // Store treasury data for yield curve calculation
   const treasuryData: { [key: string]: DataPoint[] } = {}
 
-  // Process all series except yield curve spread (calculated separately)
-  const seriesToFetch = ALL_SERIES.filter(s => s.key !== 'yield_curve_spread')
-  
-  for (const series of seriesToFetch) {
+  // Process all series (yield_curve_spread is not in ALL_SERIES — it's calculated below)
+  for (const series of ALL_SERIES) {
     try {
       console.log(`📊 Fetching ${series.name} (${series.fredSeriesId})...`)
       

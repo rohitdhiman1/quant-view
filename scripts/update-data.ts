@@ -70,15 +70,22 @@ async function updateData(): Promise<{
 
         const lastDataDate = seriesInfo.latestDate
         const nextDate = DateUtils.addDays(lastDataDate, 1)
-        
+
         // Check if we need to update (only if there might be new data)
         if (!DateUtils.isAfter(today, lastDataDate)) {
           console.log(`✅ ${series.name} is up to date (latest: ${lastDataDate})`)
           continue
         }
 
-        console.log(`📊 Checking ${series.name} for data after ${lastDataDate}...`)
-        
+        // Lightweight check: ask FRED for its latest date before fetching the range
+        const fredLatest = await fredClient.getLatestDate(series.fredSeriesId)
+        if (fredLatest && !DateUtils.isAfter(fredLatest, lastDataDate)) {
+          console.log(`✅ ${series.name} — FRED has no new data (latest: ${fredLatest})`)
+          continue
+        }
+
+        console.log(`📊 Fetching ${series.name} for data after ${lastDataDate}...`)
+
         // Fetch new data
         const newData = await fredClient.fetchSeries(
           series.fredSeriesId,
@@ -98,11 +105,6 @@ async function updateData(): Promise<{
           date: point.date,
           value: typeof point.value === 'string' ? parseFloat(point.value) : point.value
         }))
-
-        // Skip yield curve spread - it's calculated separately
-        if (series.key === 'yield_curve_spread') {
-          continue
-        }
 
         // Handle inflation data specially
         if (series.category === 'inflation') {
@@ -425,6 +427,23 @@ async function main() {
     if (!process.env.FRED_API_KEY) {
       console.error('❌ FRED_API_KEY environment variable not set')
       process.exit(1)
+    }
+
+    // Skip if already updated today (unless --force flag is passed)
+    if (!process.argv.includes('--force')) {
+      try {
+        const metadataPath = path.join(FRED_CONFIG.dataDir, 'metadata.json')
+        const metadataContent = await fs.readFile(metadataPath, 'utf-8')
+        const existingMeta: DataMetadata = JSON.parse(metadataContent)
+        const today = DateUtils.getToday()
+
+        if (existingMeta.lastUpdated === today) {
+          console.log(`Already updated today (${today}). Use --force to re-run.`)
+          return
+        }
+      } catch {
+        // No metadata — continue with update
+      }
     }
 
     const result = await updateData()
