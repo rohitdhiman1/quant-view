@@ -1,12 +1,17 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useMemo } from 'react'
 import { formatDataAge } from '@/lib/data-refresh'
 
 interface SeriesInfo {
   latestDate: string
   recordCount: number
   fredSeriesId: string
+}
+
+interface MetadataJson {
+  lastUpdated: string
+  seriesInfo: Record<string, SeriesInfo>
 }
 
 interface SeriesGroup {
@@ -17,139 +22,65 @@ interface SeriesGroup {
   emoji: string
 }
 
-export default function CompactDataStatus() {
-  const [lastUpdated, setLastUpdated] = useState<string | null>(null)
-  const [seriesGroups, setSeriesGroups] = useState<SeriesGroup[]>([])
-  const [showTooltip, setShowTooltip] = useState(false)
-  const [error, setError] = useState<boolean>(false)
+interface CompactDataStatusProps {
+  metadata: MetadataJson | null
+}
 
-  // Load data status on mount
-  useEffect(() => {
-    const loadStatus = async () => {
-      try {
-        const metadataRes = await fetch('/data/metadata.json')
-        if (!metadataRes.ok) {
-          throw new Error(`HTTP ${metadataRes.status}`)
-        }
-        const metadata = await metadataRes.json()
-        
-        setLastUpdated(metadata.lastUpdated)
-        
-        // Get all series with dates
-        const allSeries = Object.entries(metadata.seriesInfo as Record<string, SeriesInfo>).map(([key, info]) => ({
-          key,
-          latestDate: info.latestDate
-        }))
-        
-        // Group by recency
-        const sortedByDate = allSeries.sort((a, b) => 
-          new Date(b.latestDate).getTime() - new Date(a.latestDate).getTime()
+export default function CompactDataStatus({ metadata }: CompactDataStatusProps) {
+  const [showTooltip, setShowTooltip] = useState(false)
+
+  const { lastUpdated, seriesGroups } = useMemo(() => {
+    if (!metadata) return { lastUpdated: null, seriesGroups: [] }
+
+    const allSeries = Object.entries(metadata.seriesInfo).map(([key, info]) => ({
+      key,
+      latestDate: info.latestDate
+    }))
+
+    const sortedByDate = allSeries.sort((a, b) =>
+      new Date(b.latestDate).getTime() - new Date(a.latestDate).getTime()
+    )
+
+    if (sortedByDate.length === 0) return { lastUpdated: null, seriesGroups: [] }
+
+    const newestDate = sortedByDate[0].latestDate
+    const groups: SeriesGroup[] = []
+
+    const buckets: Array<{ name: string; min: number; max: number; color: string; emoji: string }> = [
+      { name: 'Current', min: 0, max: 1, color: 'text-green-600', emoji: '✨' },
+      { name: 'Recent', min: 2, max: 3, color: 'text-blue-600', emoji: '📅' },
+      { name: 'Updating Soon', min: 4, max: 7, color: 'text-amber-600', emoji: '🔄' },
+      { name: 'Refreshing', min: 8, max: Infinity, color: 'text-purple-600', emoji: '♻️' },
+    ]
+
+    for (const bucket of buckets) {
+      const matching = sortedByDate.filter(s => {
+        const daysOld = Math.ceil(
+          (new Date(newestDate).getTime() - new Date(s.latestDate).getTime()) / (1000 * 60 * 60 * 24)
         )
-        
-        const newestDate = sortedByDate[0].latestDate
-        const groups: SeriesGroup[] = []
-        
-        // Current (0-1 days old)
-        const currentSeries = sortedByDate.filter(s => {
-          const daysOld = Math.ceil(
-            (new Date(newestDate).getTime() - new Date(s.latestDate).getTime()) / (1000 * 60 * 60 * 24)
-          )
-          return daysOld <= 1
+        return daysOld >= bucket.min && daysOld <= bucket.max
+      })
+      if (matching.length > 0) {
+        groups.push({
+          name: bucket.name,
+          series: matching,
+          latestDate: matching[0].latestDate,
+          color: bucket.color,
+          emoji: bucket.emoji
         })
-        
-        if (currentSeries.length > 0) {
-          groups.push({
-            name: 'Current',
-            series: currentSeries,
-            latestDate: currentSeries[0].latestDate,
-            color: 'text-green-600',
-            emoji: '✨'
-          })
-        }
-        
-        // Recent (2-3 days old)
-        const recentSeries = sortedByDate.filter(s => {
-          const daysOld = Math.ceil(
-            (new Date(newestDate).getTime() - new Date(s.latestDate).getTime()) / (1000 * 60 * 60 * 24)
-          )
-          return daysOld >= 2 && daysOld <= 3
-        })
-        
-        if (recentSeries.length > 0) {
-          groups.push({
-            name: 'Recent',
-            series: recentSeries,
-            latestDate: recentSeries[0].latestDate,
-            color: 'text-blue-600',
-            emoji: '📅'
-          })
-        }
-        
-        // Updating Soon (4-7 days old)
-        const updatingSoonSeries = sortedByDate.filter(s => {
-          const daysOld = Math.ceil(
-            (new Date(newestDate).getTime() - new Date(s.latestDate).getTime()) / (1000 * 60 * 60 * 24)
-          )
-          return daysOld >= 4 && daysOld <= 7
-        })
-        
-        if (updatingSoonSeries.length > 0) {
-          groups.push({
-            name: 'Updating Soon',
-            series: updatingSoonSeries,
-            latestDate: updatingSoonSeries[0].latestDate,
-            color: 'text-amber-600',
-            emoji: '🔄'
-          })
-        }
-        
-        // Refreshing (8+ days old)
-        const refreshingSeries = sortedByDate.filter(s => {
-          const daysOld = Math.ceil(
-            (new Date(newestDate).getTime() - new Date(s.latestDate).getTime()) / (1000 * 60 * 60 * 24)
-          )
-          return daysOld >= 8
-        })
-        
-        if (refreshingSeries.length > 0) {
-          groups.push({
-            name: 'Refreshing',
-            series: refreshingSeries,
-            latestDate: refreshingSeries[0].latestDate,
-            color: 'text-purple-600',
-            emoji: '♻️'
-          })
-        }
-        
-        setSeriesGroups(groups)
-      } catch (error) {
-        console.error('Failed to load metadata:', error)
-        setError(true)
       }
     }
 
-    loadStatus()
-  }, [])
+    return { lastUpdated: metadata.lastUpdated, seriesGroups: groups }
+  }, [metadata])
 
-  // Error state
-  if (error) {
+  if (!metadata || !lastUpdated || seriesGroups.length === 0) {
     return (
       <div className="flex items-center gap-2">
         <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
         <div className="text-left">
           <div className="text-xs font-medium text-gray-600">Data Status</div>
           <div className="text-xs text-gray-500">Metadata unavailable</div>
-        </div>
-      </div>
-    )
-  }
-
-  if (!lastUpdated || seriesGroups.length === 0) {
-    return (
-      <div className="flex items-center gap-2">
-        <div className="w-3 h-3 bg-gray-400 rounded-full animate-pulse"></div>
-        <div className="text-left">
-          <div className="text-xs font-medium text-gray-600">Loading...</div>
         </div>
       </div>
     )

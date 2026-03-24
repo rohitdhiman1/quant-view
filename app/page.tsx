@@ -73,6 +73,16 @@ export default async function QuantViewDashboard() {
     dateRange
   }
 
+  // Load metadata for data status display
+  let metadataJson = null
+  try {
+    const metadataPath = path.join(process.cwd(), 'data', 'metadata.json')
+    const metadataContents = await fs.readFile(metadataPath, 'utf8')
+    metadataJson = JSON.parse(metadataContents)
+  } catch {
+    console.warn('Failed to load metadata.json')
+  }
+
   // Generate build timestamp
   const buildTime = new Date().toISOString()
   const formattedBuildTime = new Date(buildTime).toLocaleDateString('en-US', {
@@ -101,7 +111,7 @@ export default async function QuantViewDashboard() {
                 Macro-Economic Data Platform
               </p>
             </div>
-            <HeaderActions formattedBuildTime={formattedBuildTime} />
+            <HeaderActions formattedBuildTime={formattedBuildTime} metadata={metadataJson} />
           </div>
         </div>
       </header>

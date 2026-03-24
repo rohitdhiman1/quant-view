@@ -2,15 +2,21 @@
 
 import CompactDataStatus from './CompactDataStatus'
 
-interface HeaderActionsProps {
-  formattedBuildTime: string
+interface MetadataJson {
+  lastUpdated: string
+  seriesInfo: Record<string, { latestDate: string; recordCount: number; fredSeriesId: string }>
 }
 
-export default function HeaderActions({ formattedBuildTime }: HeaderActionsProps) {
+interface HeaderActionsProps {
+  formattedBuildTime: string
+  metadata: MetadataJson | null
+}
+
+export default function HeaderActions({ formattedBuildTime, metadata }: HeaderActionsProps) {
   return (
     <div className="flex items-center gap-6">
       {/* Data Status Indicator */}
-      <CompactDataStatus />
+      <CompactDataStatus metadata={metadata} />
       
       {/* Build Time */}
       <div className="text-right border-l border-gray-200 pl-6">
