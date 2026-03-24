@@ -40,6 +40,7 @@ export default async function QuantViewDashboard() {
     { key: 'dollar_index', filename: 'dollar_index.json' },
     { key: 'eur_usd', filename: 'eur_usd.json' },
     { key: 'sp500', filename: 'sp500.json' },
+    { key: 'fed_rate', filename: 'fed_rate.json' },
     { key: 'yield_curve_spread', filename: 'yield_curve_spread.json' }
   ]
 

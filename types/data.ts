@@ -148,6 +148,15 @@ export const SERIES_CONFIGS: Omit<SeriesConfig, 'data'>[] = [
     category: 'economic_indicators',
     unit: '%'
   },
+  // Fed Funds Rate
+  {
+    key: 'fed_rate',
+    name: 'Fed Funds Rate',
+    color: '#b91c1c', // red-700
+    visible: false,
+    category: 'economic_indicators',
+    unit: '%'
+  },
   // Labor Market
   {
     key: 'unemployment_rate',
