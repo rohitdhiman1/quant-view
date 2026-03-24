@@ -27,13 +27,13 @@
       "fredSeriesId": "DGS20"
     },
     "cpi": {
-      "latestDate": "2026-03-20",
-      "recordCount": 2053,
+      "latestDate": "2026-03-23",
+      "recordCount": 2054,
       "fredSeriesId": "CPIAUCSL"
     },
     "core_cpi": {
-      "latestDate": "2026-03-20",
-      "recordCount": 2053,
+      "latestDate": "2026-03-23",
+      "recordCount": 2054,
       "fredSeriesId": "CPILFESL"
     },
     "vix": {
@@ -47,13 +47,13 @@
       "fredSeriesId": "GVZCLS"
     },
     "unemployment_rate": {
-      "latestDate": "2026-03-20",
-      "recordCount": 2053,
+      "latestDate": "2026-03-23",
+      "recordCount": 2054,
       "fredSeriesId": "UNRATE"
     },
     "oil_price": {
       "latestDate": "2026-03-16",
-      "recordCount": 2050,
+      "recordCount": 2049,
       "fredSeriesId": "DCOILWTICO"
     },
     "dollar_index": {
@@ -70,6 +70,11 @@
       "latestDate": "2026-03-23",
       "recordCount": 2066,
       "fredSeriesId": "SP500"
+    },
+    "fed_rate": {
+      "latestDate": "2026-03-23",
+      "recordCount": 3004,
+      "fredSeriesId": "DFF"
     },
     "yield_curve_spread": {
       "latestDate": "2026-03-23",
