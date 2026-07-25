@@ -1,29 +1,29 @@
 {
-  "lastUpdated": "2026-07-08",
+  "lastUpdated": "2026-07-31",
   "seriesInfo": {
     "treasury_1y": {
-      "latestDate": "2026-07-06",
-      "recordCount": 2126,
+      "latestDate": "2026-07-29",
+      "recordCount": 2143,
       "fredSeriesId": "DGS1"
     },
     "treasury_2y": {
-      "latestDate": "2026-07-06",
-      "recordCount": 2126,
+      "latestDate": "2026-07-29",
+      "recordCount": 2143,
       "fredSeriesId": "DGS2"
     },
     "treasury_5y": {
-      "latestDate": "2026-07-06",
-      "recordCount": 2126,
+      "latestDate": "2026-07-29",
+      "recordCount": 2143,
       "fredSeriesId": "DGS5"
     },
     "treasury_10y": {
-      "latestDate": "2026-07-06",
-      "recordCount": 2126,
+      "latestDate": "2026-07-29",
+      "recordCount": 2143,
       "fredSeriesId": "DGS10"
     },
     "treasury_20y": {
-      "latestDate": "2026-07-06",
-      "recordCount": 2126,
+      "latestDate": "2026-07-29",
+      "recordCount": 2143,
       "fredSeriesId": "DGS20"
     },
     "cpi": {
@@ -37,13 +37,13 @@
       "fredSeriesId": "CPILFESL"
     },
     "vix": {
-      "latestDate": "2026-07-07",
-      "recordCount": 2170,
+      "latestDate": "2026-07-29",
+      "recordCount": 2186,
       "fredSeriesId": "VIXCLS"
     },
     "gvz": {
-      "latestDate": "2026-07-07",
-      "recordCount": 2140,
+      "latestDate": "2026-07-29",
+      "recordCount": 2156,
       "fredSeriesId": "GVZCLS"
     },
     "unemployment_rate": {
@@ -52,33 +52,33 @@
       "fredSeriesId": "UNRATE"
     },
     "oil_price": {
-      "latestDate": "2026-06-29",
-      "recordCount": 2121,
+      "latestDate": "2026-07-27",
+      "recordCount": 2140,
       "fredSeriesId": "DCOILWTICO"
     },
     "dollar_index": {
-      "latestDate": "2026-07-02",
-      "recordCount": 2121,
+      "latestDate": "2026-07-24",
+      "recordCount": 2136,
       "fredSeriesId": "DTWEXBGS"
     },
     "eur_usd": {
-      "latestDate": "2026-07-02",
-      "recordCount": 2123,
+      "latestDate": "2026-07-24",
+      "recordCount": 2138,
       "fredSeriesId": "DEXUSEU"
     },
     "sp500": {
-      "latestDate": "2026-07-07",
-      "recordCount": 2138,
+      "latestDate": "2026-07-29",
+      "recordCount": 2154,
       "fredSeriesId": "SP500"
     },
     "fed_rate": {
-      "latestDate": "2026-07-06",
-      "recordCount": 3109,
+      "latestDate": "2026-07-29",
+      "recordCount": 3132,
       "fredSeriesId": "DFF"
     },
     "yield_curve_spread": {
-      "latestDate": "2026-07-06",
-      "recordCount": 2126,
+      "latestDate": "2026-07-29",
+      "recordCount": 2143,
       "fredSeriesId": "T10Y2Y (calculated)"
     }
   }
