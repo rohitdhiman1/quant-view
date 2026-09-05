@@ -1,29 +1,29 @@
 {
-  "lastUpdated": "2026-09-05",
+  "lastUpdated": "2026-09-11",
   "seriesInfo": {
     "treasury_1y": {
-      "latestDate": "2026-09-03",
-      "recordCount": 2169,
+      "latestDate": "2026-09-09",
+      "recordCount": 2172,
       "fredSeriesId": "DGS1"
     },
     "treasury_2y": {
-      "latestDate": "2026-09-03",
-      "recordCount": 2169,
+      "latestDate": "2026-09-09",
+      "recordCount": 2172,
       "fredSeriesId": "DGS2"
     },
     "treasury_5y": {
-      "latestDate": "2026-09-03",
-      "recordCount": 2169,
+      "latestDate": "2026-09-09",
+      "recordCount": 2172,
       "fredSeriesId": "DGS5"
     },
     "treasury_10y": {
-      "latestDate": "2026-09-03",
-      "recordCount": 2169,
+      "latestDate": "2026-09-09",
+      "recordCount": 2172,
       "fredSeriesId": "DGS10"
     },
     "treasury_20y": {
-      "latestDate": "2026-09-03",
-      "recordCount": 2169,
+      "latestDate": "2026-09-09",
+      "recordCount": 2172,
       "fredSeriesId": "DGS20"
     },
     "cpi": {
@@ -42,8 +42,8 @@
       "fredSeriesId": "VIXCLS"
     },
     "gvz": {
-      "latestDate": "2026-09-03",
-      "recordCount": 2182,
+      "latestDate": "2026-09-09",
+      "recordCount": 2185,
       "fredSeriesId": "GVZCLS"
     },
     "unemployment_rate": {
@@ -52,33 +52,33 @@
       "fredSeriesId": "UNRATE"
     },
     "oil_price": {
-      "latestDate": "2026-09-01",
-      "recordCount": 2166,
+      "latestDate": "2026-09-09",
+      "recordCount": 2171,
       "fredSeriesId": "DCOILWTICO"
     },
     "dollar_index": {
-      "latestDate": "2026-08-28",
-      "recordCount": 2161,
+      "latestDate": "2026-09-04",
+      "recordCount": 2166,
       "fredSeriesId": "DTWEXBGS"
     },
     "eur_usd": {
-      "latestDate": "2026-08-28",
-      "recordCount": 2163,
+      "latestDate": "2026-09-04",
+      "recordCount": 2168,
       "fredSeriesId": "DEXUSEU"
     },
     "sp500": {
-      "latestDate": "2026-09-04",
-      "recordCount": 2181,
+      "latestDate": "2026-09-10",
+      "recordCount": 2184,
       "fredSeriesId": "SP500"
     },
     "fed_rate": {
-      "latestDate": "2026-09-03",
-      "recordCount": 3168,
+      "latestDate": "2026-09-09",
+      "recordCount": 3174,
       "fredSeriesId": "DFF"
     },
     "yield_curve_spread": {
-      "latestDate": "2026-09-03",
-      "recordCount": 2169,
+      "latestDate": "2026-09-09",
+      "recordCount": 2172,
       "fredSeriesId": "T10Y2Y (calculated)"
     }
   }
