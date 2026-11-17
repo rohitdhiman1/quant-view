@@ -1,29 +1,29 @@
 {
-  "lastUpdated": "2026-11-05",
+  "lastUpdated": "2026-11-17",
   "seriesInfo": {
     "treasury_1y": {
-      "latestDate": "2026-11-04",
-      "recordCount": 2211,
+      "latestDate": "2026-11-13",
+      "recordCount": 2217,
       "fredSeriesId": "DGS1"
     },
     "treasury_2y": {
-      "latestDate": "2026-11-04",
-      "recordCount": 2211,
+      "latestDate": "2026-11-13",
+      "recordCount": 2217,
       "fredSeriesId": "DGS2"
     },
     "treasury_5y": {
-      "latestDate": "2026-11-04",
-      "recordCount": 2211,
+      "latestDate": "2026-11-13",
+      "recordCount": 2217,
       "fredSeriesId": "DGS5"
     },
     "treasury_10y": {
-      "latestDate": "2026-11-04",
-      "recordCount": 2211,
+      "latestDate": "2026-11-13",
+      "recordCount": 2217,
       "fredSeriesId": "DGS10"
     },
     "treasury_20y": {
-      "latestDate": "2026-11-04",
-      "recordCount": 2211,
+      "latestDate": "2026-11-13",
+      "recordCount": 2217,
       "fredSeriesId": "DGS20"
     },
     "cpi": {
@@ -37,13 +37,13 @@
       "fredSeriesId": "CPILFESL"
     },
     "vix": {
-      "latestDate": "2026-11-04",
-      "recordCount": 2256,
+      "latestDate": "2026-11-13",
+      "recordCount": 2263,
       "fredSeriesId": "VIXCLS"
     },
     "gvz": {
-      "latestDate": "2026-11-04",
-      "recordCount": 2225,
+      "latestDate": "2026-11-13",
+      "recordCount": 2232,
       "fredSeriesId": "GVZCLS"
     },
     "unemployment_rate": {
@@ -52,33 +52,33 @@
       "fredSeriesId": "UNRATE"
     },
     "oil_price": {
-      "latestDate": "2026-11-03",
-      "recordCount": 2210,
+      "latestDate": "2026-11-11",
+      "recordCount": 2216,
       "fredSeriesId": "DCOILWTICO"
     },
     "dollar_index": {
-      "latestDate": "2026-10-30",
-      "recordCount": 2204,
+      "latestDate": "2026-11-13",
+      "recordCount": 2213,
       "fredSeriesId": "DTWEXBGS"
     },
     "eur_usd": {
-      "latestDate": "2026-10-30",
-      "recordCount": 2206,
+      "latestDate": "2026-11-13",
+      "recordCount": 2215,
       "fredSeriesId": "DEXUSEU"
     },
     "sp500": {
-      "latestDate": "2026-11-04",
-      "recordCount": 2223,
+      "latestDate": "2026-11-16",
+      "recordCount": 2231,
       "fredSeriesId": "SP500"
     },
     "fed_rate": {
-      "latestDate": "2026-11-04",
-      "recordCount": 3230,
+      "latestDate": "2026-11-13",
+      "recordCount": 3239,
       "fredSeriesId": "DFF"
     },
     "yield_curve_spread": {
-      "latestDate": "2026-11-04",
-      "recordCount": 2211,
+      "latestDate": "2026-11-13",
+      "recordCount": 2217,
       "fredSeriesId": "T10Y2Y (calculated)"
     }
   }
